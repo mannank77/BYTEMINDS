@@ -1,7 +1,7 @@
 """
 BIS Standards Recommendation & Compliance Engine — Streamlit UI
 Government of India (GoI) & GIGW 3.0 Compliant National Regulatory Intelligence Portal
-Includes 1-Click Google Translate Integration for Multilingual Translation
+1-Click Instant Language Switcher (English <-> हिन्दी Hindi)
 Typography: Montserrat (Headings) + Poppins (UI Body)
 """
 
@@ -9,7 +9,6 @@ import time
 import json
 import hashlib
 import streamlit as st
-import streamlit.components.v1 as components
 
 from src.retriever import get_retriever
 from src.pipeline import run_enriched_pipeline, get_query_validation
@@ -48,12 +47,83 @@ def compute_sha256(text: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 🌐 Multilingual Language Dictionary (1-Click Switcher)
+# ─────────────────────────────────────────────────────────────────────────────
+TRANSLATIONS = {
+    "English": {
+        "portal_title": "Bureau of Indian Standards (BIS) Standards & Compliance Engine",
+        "portal_sub": "National Regulatory Intelligence, Mandatory QCO Verification & Automated GeM/CPWD Tender Clause Generator",
+        "active_status": "Portal Active (BIS Act 2016)",
+        "gazette_ticker": "Mandatory ISI Certification Mark (Scheme-I) enforced under BIS Act 2016 for Structural Steel (IS 1786), Hydraulic Cements (IS 269), Aggregates (IS 383), and Precast Concrete. Non-compliance invites penal proceedings under Section 29.",
+        "search_label": "Enter Material, Product, or Tender Specification Query",
+        "search_placeholder": "e.g. High-strength OPC 53 grade cement for structural columns OR Fe 500D earthquake resistant rebar OR fine aggregates for concrete...",
+        "btn_search": "Search Bureau Standards & Generate Specs",
+        "btn_clear": "Clear Search",
+        "tab_search": "🔍 Smart Search & Complete Specification",
+        "tab_compare": "🔄 Side-by-Side Scope Comparator",
+        "tab_registry": "📜 Standards & QCO Registry Browser",
+        "subtab_overview": "📌 Overview & Gazette Currency",
+        "subtab_normative": "🔬 Normative Tests & Allied Codes",
+        "subtab_params": "📊 Technical Parameters & Limits",
+        "subtab_qco": "🏛️ Statutory QCO & Legal Mandate",
+        "subtab_tender": "📝 GeM/CPWD Tender Clause & Site QA",
+        "metric_recommended": "Standards Recommended",
+        "metric_latency": "Hybrid Search & Graph Latency",
+        "metric_qco": "QCO Scheme-I Verification",
+        "metric_offline": "Air-Gapped & Zero-Data-Leakage",
+        "sidebar_control": "Control Center",
+        "sidebar_control_sub": "Search parameters & regulatory filter settings",
+        "sidebar_guardrail": "Enable LLM Guardrail (Ollama)",
+        "sidebar_topk": "Recommendations Count (Top-K)",
+        "sidebar_quick_queries": "Quick Technical Queries",
+        "sidebar_protocols": "Verified Engine Protocols",
+        "badge_active": "ACTIVE",
+        "badge_superseded": "SUPERSEDED BY",
+        "badge_qco": "MANDATORY QCO (ISI MARK)",
+        "badge_voluntary": "VOLUNTARY / STANDARD"
+    },
+    "हिन्दी (Hindi)": {
+        "portal_title": "भारतीय मानक ब्यूरो (BIS) — मानक एवं विनियामक अनुपालन प्रणाली",
+        "portal_sub": "राष्ट्रीय विनियामक बुद्धिमत्ता, अनिवार्य QCO सत्यापन एवं GeM/CPWD निविदा खंड जनरेटर",
+        "active_status": "पोर्टल सक्रिय (BIS अधिनियम 2016)",
+        "gazette_ticker": "संरचनात्मक स्टील (IS 1786), सीमेंट (IS 269), और कंक्रीट के लिए BIS अधिनियम 2016 के तहत अनिवार्य ISI मार्क (स्कीम-I) लागू। उल्लंघन पर धारा 29 के तहत दंडात्मक कार्यवाही।",
+        "search_label": "सामग्री, उत्पाद या निविदा विनिर्देश खोज दर्ज करें",
+        "search_placeholder": "उदाहरण: संरचनात्मक कॉलम के लिए उच्च सामर्थ्य OPC 53 सीमेंट या Fe 500D सरिया...",
+        "btn_search": "मानक खोजें एवं विनिर्देश जनरेट करें",
+        "btn_clear": "खोज साफ़ करें",
+        "tab_search": "🔍 स्मार्ट खोज एवं पूर्ण विनिर्देश",
+        "tab_compare": "🔄 दायरा तुलना एवं विश्लेषण",
+        "tab_registry": "📜 मानक एवं QCO मास्टर रजिस्ट्री",
+        "subtab_overview": "📌 अवलोकन एवं राजपत्र स्थिति",
+        "subtab_normative": "🔬 अनिवार्य परीक्षण एवं संबद्ध कोड",
+        "subtab_params": "📊 तकनीकी पैरामीटर एवं सीमाएं",
+        "subtab_qco": "🏛️ विधिक QCO एवं कानूनी आदेश",
+        "subtab_tender": "📝 GeM/CPWD निविदा खंड एवं QA चेकलिस्ट",
+        "metric_recommended": "अनुशंसित मानक",
+        "metric_latency": "खोज एवं विश्लेषण विलंबता",
+        "metric_qco": "QCO स्कीम-I सत्यापन",
+        "metric_offline": "100% ऑफ़लाइन / डेटा सुरक्षा",
+        "sidebar_control": "नियंत्रण केंद्र",
+        "sidebar_control_sub": "खोज पैरामीटर एवं विनियामक फ़िल्टर",
+        "sidebar_guardrail": "LLM गार्डरेल सक्षम करें (Ollama)",
+        "sidebar_topk": "सिफारिशों की संख्या (Top-K)",
+        "sidebar_quick_queries": "त्वरित तकनीकी प्रश्न",
+        "sidebar_protocols": "सत्यापित इंजन प्रोटोकॉल",
+        "badge_active": "सक्रिय",
+        "badge_superseded": "द्वारा प्रतिस्थापित",
+        "badge_qco": "अनिवार्य QCO (ISI मार्क)",
+        "badge_voluntary": "स्वैच्छिक / मानक"
+    }
+}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 🎨 GIGW 3.0 Typography & Design System (Custom CSS)
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
-    /* Google Fonts: Montserrat (Headings) + Poppins (UI Body) */
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@500;700&display=swap');
+    /* Google Fonts: Montserrat (Headings) + Poppins (UI Body) + Noto Sans Devanagari */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
     /* 1. Protect Streamlit Material Symbols / Material Icons from font overrides */
     [data-testid="stIcon"],
@@ -74,20 +144,20 @@ st.markdown("""
 
     /* 2. Global Typography */
     .stApp, .stMarkdown, .stText, p, label, input, textarea, select {
-        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
         color: #1e293b;
     }
     
     /* Headings with Montserrat */
     h1, h2, h3, h4, h5, h6, .gov-title-en, .std-code-title, .search-label, .rank-tag, .section-heading {
-        font-family: 'Montserrat', 'Poppins', sans-serif !important;
+        font-family: 'Montserrat', 'Poppins', 'Noto Sans Devanagari', sans-serif !important;
         letter-spacing: -0.3px;
         font-weight: 700 !important;
     }
 
     /* Buttons, Action Badges & Tabs */
     .stButton > button, div[data-baseweb="tab-list"] button, .gigw-pill, .score-chip, .stamp-badge, .gov-status-tag {
-        font-family: 'Montserrat', sans-serif !important;
+        font-family: 'Montserrat', 'Poppins', sans-serif !important;
         font-weight: 600 !important;
         letter-spacing: 0.2px;
     }
@@ -123,19 +193,6 @@ st.markdown("""
         border-radius: 4px;
         font-weight: 600;
         color: #f8fafc;
-    }
-
-    /* Google Translate Widget Styling */
-    .translate-container {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 4px;
-        padding: 2px 8px;
-        color: #ffffff;
-        font-size: 0.76rem;
     }
 
     /* National Tricolor Accent Stripe */
@@ -212,6 +269,18 @@ st.markdown("""
         align-items: center;
         gap: 10px;
         box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    /* Language Switcher Bar */
+    .lang-toolbar {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 4px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
     }
 
     /* Sidebar Clean Styling */
@@ -516,29 +585,7 @@ st.markdown("""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🌐 Google Translate Integration Component
-# ─────────────────────────────────────────────────────────────────────────────
-components.html("""
-    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 4px 8px; font-family: 'Poppins', sans-serif; font-size: 12px; color: #334155;">
-        <span style="font-weight: 600;">🌐 Select Language (Google Translate):</span>
-        <div id="google_translate_element"></div>
-    </div>
-    <script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        includedLanguages: 'en,hi,bn,te,mr,ta,gu,kn,ml,pa',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-        autoDisplay: false
-      }, 'google_translate_element');
-    }
-    </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-""", height=42)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 🏛️ 1. GIGW Accessibility Header & Masthead (Clean, No Dual Stacking)
+# 🏛️ 1. GIGW Accessibility Top Bar with 1-Click Language Switcher
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="gigw-top-bar">
@@ -550,33 +597,51 @@ st.markdown("""
     <div class="gigw-top-right">
         <span class="gigw-pill">GIGW 3.0 Compliant</span>
         <span class="gigw-pill">BIS Act 2016</span>
-        <span class="gigw-pill">National Regulatory Portal</span>
+        <span class="gigw-pill">National Portal</span>
     </div>
 </div>
 <div class="tricolor-stripe"></div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
+# Language Selector Bar (100% visible, no clipping)
+c_bar1, c_bar2 = st.columns([4, 1.2])
+with c_bar1:
+    st.caption("🌐 **Official Language Switcher / भाषा चयन:** Switch portal display language instantly with 1-click:")
+with c_bar2:
+    selected_lang = st.selectbox(
+        "Language",
+        ["English", "हिन्दी (Hindi)"],
+        index=0,
+        label_visibility="collapsed",
+        key="portal_lang"
+    )
+
+T = TRANSLATIONS.get(selected_lang, TRANSLATIONS["English"])
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 🏛️ 2. Bureau Masthead
+# ─────────────────────────────────────────────────────────────────────────────
+st.markdown(f"""
 <div class="gov-masthead">
     <div class="gov-masthead-left">
         <div class="gov-emblem-box">🏛️</div>
         <div>
-            <div class="gov-title-en">Bureau of Indian Standards (BIS) Standards & Compliance Engine</div>
-            <div class="gov-subtitle">National Regulatory Intelligence, Mandatory QCO Verification & Automated GeM/CPWD Tender Clause Generator</div>
+            <div class="gov-title-en">{T['portal_title']}</div>
+            <div class="gov-subtitle">{T['portal_sub']}</div>
         </div>
     </div>
     <div>
         <div class="gov-status-tag">
-            <span>●</span> <strong>Portal Active (BIS Act 2016)</strong>
+            <span>●</span> <strong>{T['active_status']}</strong>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
+st.markdown(f"""
 <div class="gazette-ticker">
     <span>📜 <strong>GAZETTE NOTIFICATION & QUALITY CONTROL ORDER (QCO):</strong></span>
-    <span>Mandatory ISI Certification Mark (Scheme-I) enforced under BIS Act 2016 for Structural Steel (IS 1786), Hydraulic Cements (IS 269), Aggregates (IS 383), and Precast Concrete. Non-compliance invites penal proceedings under Section 29.</span>
+    <span>{T['gazette_ticker']}</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -585,23 +650,23 @@ st.markdown("""
 # ⚙️ Clean Redesigned Sidebar
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("""
+    st.markdown(f"""
     <div class="sidebar-header-card">
-        <div class="sidebar-header-title">⚙️ Control Center</div>
-        <div class="sidebar-header-sub">Search parameters & regulatory filter settings</div>
+        <div class="sidebar-header-title">⚙️ {T['sidebar_control']}</div>
+        <div class="sidebar-header-sub">{T['sidebar_control_sub']}</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="sidebar-section-title">🛡️ AI & Retrieval Settings</div>', unsafe_allow_html=True)
     enable_validation = st.checkbox(
-        "Enable LLM Guardrail (Ollama)",
+        T["sidebar_guardrail"],
         value=False,
         help="Filters out queries unrelated to construction materials using Ollama (phi:2.7b)"
     )
     
-    top_k = st.slider("Recommendations Count (Top-K)", min_value=3, max_value=8, value=5)
+    top_k = st.slider(T["sidebar_topk"], min_value=3, max_value=8, value=5)
 
-    st.markdown('<div class="sidebar-section-title">📚 Quick Technical Queries</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sidebar-section-title">📚 {T["sidebar_quick_queries"]}</div>', unsafe_allow_html=True)
     st.caption("Click any preset query to test standard retrieval:")
 
     quick_queries = [
@@ -618,7 +683,7 @@ with st.sidebar:
             st.session_state["query_input"] = full_q
             st.rerun()
 
-    st.markdown('<div class="sidebar-section-title">🏛️ Verified Engine Protocols</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sidebar-section-title">🏛️ {T["sidebar_protocols"]}</div>', unsafe_allow_html=True)
     st.markdown("""
     - ⚡ **Hybrid BM25 + Dense Embeddings**
     - 🔄 **Consolidated Lifecycle (IS 269:2015)**
@@ -633,9 +698,9 @@ with st.sidebar:
 # 📑 Main Navigation Tabs
 # ─────────────────────────────────────────────────────────────────────────────
 tab_search, tab_compare, tab_registry = st.tabs([
-    "🔍 Smart Search & Complete Specification",
-    "🔄 Side-by-Side Scope Comparator",
-    "📜 Standards & QCO Registry Browser"
+    T["tab_search"],
+    T["tab_compare"],
+    T["tab_registry"]
 ])
 
 
@@ -646,19 +711,19 @@ with tab_search:
     default_text = st.session_state.get("query_input", "")
 
     with st.form("search_form"):
-        st.markdown('<div class="search-label">📝 Enter Material, Product, or Tender Specification Query</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="search-label">📝 {T["search_label"]}</div>', unsafe_allow_html=True)
         query = st.text_area(
             "Query Description",
             value=default_text,
             height=85,
-            placeholder="e.g. High-strength OPC 53 grade cement for structural columns OR Fe 500D earthquake resistant rebar OR fine aggregates for concrete...",
+            placeholder=T["search_placeholder"],
             label_visibility="collapsed"
         )
         col1, col2, col3 = st.columns([3, 1, 1])
         with col1:
-            submitted = st.form_submit_button("🔍 Search Bureau Standards & Generate Specs", use_container_width=True, type="primary")
+            submitted = st.form_submit_button(f"🔍 {T['btn_search']}", use_container_width=True, type="primary")
         with col2:
-            clear_btn = st.form_submit_button("🗑️ Clear Search", use_container_width=True)
+            clear_btn = st.form_submit_button(f"🗑️ {T['btn_clear']}", use_container_width=True)
 
     if clear_btn:
         st.session_state["query_input"] = ""
@@ -694,24 +759,24 @@ with tab_search:
                 <div class="metric-grid">
                     <div class="gov-metric-card">
                         <div class="gov-metric-val">{len(enriched['results'])}</div>
-                        <div class="gov-metric-lbl">Standards Recommended</div>
+                        <div class="gov-metric-lbl">{T['metric_recommended']}</div>
                     </div>
                     <div class="gov-metric-card">
                         <div class="gov-metric-val">{t_elapsed:.3f}s</div>
-                        <div class="gov-metric-lbl">Hybrid Search & Graph Latency</div>
+                        <div class="gov-metric-lbl">{T['metric_latency']}</div>
                     </div>
                     <div class="gov-metric-card">
-                        <div class="gov-metric-val">{'✅ Enforced' if any(r['compliance'].get('is_mandatory') for r in enriched['results']) else 'ℹ️ Standard'}</div>
-                        <div class="gov-metric-lbl">QCO Scheme-I Verification</div>
+                        <div class="gov-metric-val">{'✅ ' + T['badge_active'] if any(r['compliance'].get('is_mandatory') for r in enriched['results']) else 'ℹ️ Standard'}</div>
+                        <div class="gov-metric-lbl">{T['metric_qco']}</div>
                     </div>
                     <div class="gov-metric-card">
                         <div class="gov-metric-val">🔒 100% Offline</div>
-                        <div class="gov-metric-lbl">Air-Gapped & Zero-Data-Leakage</div>
+                        <div class="gov-metric-lbl">{T['metric_offline']}</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.markdown("### 📋 Recommended Bureau Standards & Complete Specification Cards")
+                st.markdown(f"### 📋 {T['tab_search']}")
 
                 # Iterate through results
                 for rank, item in enumerate(enriched["results"], start=1):
@@ -726,16 +791,16 @@ with tab_search:
 
                     # Badges
                     if curr["is_current"]:
-                        status_badge = f'<span class="badge-active-gov">🟢 ACTIVE: {curr["current_version"]}</span>'
+                        status_badge = f'<span class="badge-active-gov">🟢 {T["badge_active"]}: {curr["current_version"]}</span>'
                         card_class = "gov-result-card"
                     else:
-                        status_badge = f'<span class="badge-superseded-gov">⚠️ SUPERSEDED BY {curr["current_version"]}</span>'
+                        status_badge = f'<span class="badge-superseded-gov">⚠️ {T["badge_superseded"]} {curr["current_version"]}</span>'
                         card_class = "gov-result-card-superseded"
 
                     if comp.get("is_mandatory"):
-                        qco_badge = '<span class="badge-qco-gov">🛑 MANDATORY QCO (ISI MARK)</span>'
+                        qco_badge = f'<span class="badge-qco-gov">🛑 {T["badge_qco"]}</span>'
                     else:
-                        qco_badge = f'<span class="badge-voluntary-gov">ℹ️ {comp.get("legal_status", "VOLUNTARY")}</span>'
+                        qco_badge = f'<span class="badge-voluntary-gov">ℹ️ {comp.get("legal_status", T["badge_voluntary"])}</span>'
 
                     # Header card
                     st.markdown(f"""
@@ -760,17 +825,17 @@ with tab_search:
                     if curr.get("warning_message"):
                         st.markdown(f"""
                         <div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #92400e; margin-bottom: 12px;">
-                            ⚠️ <strong>Superseded Standard Notice:</strong> {curr["warning_message"]}
+                            ⚠️ <strong>Notice:</strong> {curr["warning_message"]}
                         </div>
                         """, unsafe_allow_html=True)
 
                     # Multi-dimensional tabs per recommendation
                     st_tab1, st_tab2, st_tab3, st_tab4, st_tab5 = st.tabs([
-                        "📌 Overview & Gazette Currency",
-                        "🔬 Normative Tests & Allied Codes",
-                        "📊 Technical Parameters & Limits",
-                        "🏛️ Statutory QCO & Legal Mandate",
-                        "📝 GeM/CPWD Tender Clause & Site QA"
+                        T["subtab_overview"],
+                        T["subtab_normative"],
+                        T["subtab_params"],
+                        T["subtab_qco"],
+                        T["subtab_tender"]
                     ])
 
                     # ── Sub-Tab 1: Overview & Currency ──
@@ -965,7 +1030,7 @@ with tab_search:
 # ── TAB 2: Side-by-Side Scope Comparator
 # ─────────────────────────────────────────────────────────────────────────────
 with tab_compare:
-    st.markdown("### 🔄 Side-by-Side Scope Comparator & Engineering Disambiguation")
+    st.markdown(f"### {T['tab_compare']}")
     st.markdown("Compare overlapping Bureau standards to determine precise engineering suitability, chemical exposure limits, and life-cycle durability.")
 
     available_standards = ["IS 269", "IS 1489 (Part 1)", "IS 455", "IS 456", "IS 1343", "IS 4926", "IS 383", "IS 1786", "IS 2116", "IS 3466"]
@@ -1004,7 +1069,7 @@ with tab_compare:
 # ── TAB 3: Standards & QCO Registry Browser
 # ─────────────────────────────────────────────────────────────────────────────
 with tab_registry:
-    st.markdown("### 📜 BIS Standards Lifecycle & QCO Master Registry")
+    st.markdown(f"### {T['tab_registry']}")
     st.markdown("Browse active, superseded, and consolidated Indian Standards along with gazette amendment tracking.")
 
     reg_data = currency_mgr.registry
@@ -1012,7 +1077,7 @@ with tab_registry:
 
     for code, info in reg_data.items():
         if search_reg.lower() in code.lower() or search_reg.lower() in info.get("title", "").lower() or not search_reg:
-            badge = "🟢 ACTIVE" if info.get("status") == "ACTIVE" else "⚠️ SUPERSEDED"
+            badge = f"🟢 {T['badge_active']}" if info.get("status") == "ACTIVE" else f"⚠️ {T['badge_superseded']}"
             with st.expander(f"📘 {code}: {info.get('title')} — [{badge}]"):
                 st.markdown(f"- **Current Active Version:** `{info.get('current_version')}`")
                 st.markdown(f"- **Lifecycle Status:** `{info.get('status')}`")
