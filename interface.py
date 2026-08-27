@@ -1,6 +1,7 @@
 """
 BIS Standards Recommendation & Compliance Engine — Streamlit UI
 Government of India (GoI) & GIGW 3.0 Compliant National Regulatory Intelligence Portal
+Typography inspired by the Official Smart India Hackathon (SIH) Portal (Montserrat + Poppins + Noto Sans Devanagari)
 Developed by Team BYTEMINDS for Smart India Hackathon (SIH)
 """
 
@@ -46,29 +47,45 @@ def compute_sha256(text: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🎨 GIGW 3.0 & Government of India Design System (Custom CSS)
+# 🎨 SIH 2024 & GIGW 3.0 Typography & Design System (Custom CSS)
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+    /* Google Fonts: Montserrat (SIH Branding & Headings) + Poppins (UI Body) + Noto Sans Devanagari (Indic) */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
-    /* Global Typography & Resets */
-    html, body, [class*="css"] {
-        font-family: 'Inter', 'Noto Sans Devanagari', -apple-system, sans-serif;
+    /* Global Typography - SIH Inspiration */
+    html, body, [class*="css"], .stMarkdown, .stText, p, span, label, div {
+        font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif !important;
         color: #1e293b;
     }
     
+    /* Headings with Montserrat (Bold, Energetic SIH Aesthetic) */
+    h1, h2, h3, h4, h5, h6, .gov-title-en, .std-code-title, .search-label, .rank-tag, .section-heading {
+        font-family: 'Montserrat', 'Poppins', sans-serif !important;
+        letter-spacing: -0.3px;
+        font-weight: 700 !important;
+    }
+
+    /* Buttons, Action Badges & Tabs */
+    .stButton > button, div[data-baseweb="tab-list"] button, .gigw-pill, .score-chip, .stamp-badge, .gov-status-tag {
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.2px;
+    }
+
     /* GIGW Accessibility Top Bar */
     .gigw-top-bar {
         background-color: #071e3d;
         color: #cbd5e1;
-        padding: 5px 18px;
-        font-size: 0.78rem;
+        padding: 6px 20px;
+        font-size: 0.8rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #1e3a8a;
         margin: -1rem -1rem 0 -1rem;
+        font-family: 'Poppins', sans-serif;
     }
     .gigw-top-left {
         display: flex;
@@ -79,12 +96,12 @@ st.markdown("""
     .gigw-top-right {
         display: flex;
         align-items: center;
-        gap: 16px;
-        font-size: 0.75rem;
+        gap: 12px;
+        font-size: 0.76rem;
     }
     .gigw-pill {
-        background: rgba(255, 255, 255, 0.12);
-        padding: 2px 8px;
+        background: rgba(255, 255, 255, 0.14);
+        padding: 3px 9px;
         border-radius: 4px;
         font-weight: 600;
         color: #f8fafc;
@@ -108,7 +125,7 @@ st.markdown("""
         border-bottom: 2px solid #e2e8f0;
         margin-bottom: 16px;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 14px;
     }
     .gov-masthead-left {
         display: flex;
@@ -128,26 +145,26 @@ st.markdown("""
         font-weight: 700;
         color: #b45309;
         letter-spacing: -0.2px;
-        font-family: 'Noto Sans Devanagari', sans-serif;
+        font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif !important;
     }
     .gov-title-en {
-        font-size: 1.45rem;
+        font-size: 1.5rem;
         font-weight: 800;
         color: #071e3d;
         letter-spacing: -0.4px;
         line-height: 1.25;
     }
     .gov-subtitle {
-        font-size: 0.86rem;
+        font-size: 0.88rem;
         color: #475569;
         font-weight: 500;
-        margin-top: 2px;
+        margin-top: 3px;
     }
     .gov-status-tag {
         background: #ecfdf5;
         border: 1px solid #a7f3d0;
         color: #065f46;
-        padding: 6px 12px;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.78rem;
         font-weight: 700;
@@ -162,8 +179,8 @@ st.markdown("""
         border: 1px solid #fde68a;
         border-left: 5px solid #d97706;
         color: #92400e;
-        padding: 9px 14px;
-        font-size: 0.84rem;
+        padding: 10px 16px;
+        font-size: 0.86rem;
         font-weight: 600;
         border-radius: 6px;
         margin-bottom: 20px;
@@ -184,7 +201,7 @@ st.markdown("""
         box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     .search-label {
-        font-size: 0.95rem;
+        font-size: 0.98rem;
         font-weight: 700;
         color: #071e3d;
         margin-bottom: 8px;
@@ -193,11 +210,11 @@ st.markdown("""
         gap: 6px;
     }
 
-    /* Metric Summary Dashboard */
+    /* Metric Summary Dashboard (SIH Styled) */
     .metric-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 12px;
+        gap: 14px;
         margin: 16px 0 22px 0;
     }
     .gov-metric-card {
@@ -205,22 +222,23 @@ st.markdown("""
         border: 1px solid #e2e8f0;
         border-top: 3px solid #071e3d;
         border-radius: 6px;
-        padding: 12px 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        padding: 14px 18px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
     .gov-metric-val {
-        font-size: 1.45rem;
+        font-size: 1.55rem;
         font-weight: 800;
         color: #071e3d;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Montserrat', sans-serif !important;
     }
     .gov-metric-lbl {
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         font-weight: 700;
         color: #64748b;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.7px;
         margin-top: 2px;
+        font-family: 'Montserrat', sans-serif !important;
     }
 
     /* Recommendation Cards */
@@ -247,25 +265,26 @@ st.markdown("""
     .rank-tag {
         background: #071e3d;
         color: #ffffff;
-        padding: 3px 9px;
+        padding: 3px 10px;
         border-radius: 4px;
         font-weight: 800;
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         margin-right: 8px;
+        font-family: 'Montserrat', sans-serif !important;
     }
     .std-code-title {
-        font-size: 1.3rem;
+        font-size: 1.35rem;
         font-weight: 800;
         color: #071e3d;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: 'JetBrains Mono', monospace !important;
     }
     .score-chip {
         background: #f1f5f9;
         color: #0f172a;
         border: 1px solid #cbd5e1;
-        padding: 4px 10px;
+        padding: 4px 12px;
         border-radius: 6px;
-        font-size: 0.8rem;
+        font-size: 0.82rem;
         font-weight: 700;
     }
 
@@ -273,42 +292,46 @@ st.markdown("""
     .badge-active-gov {
         background-color: #dcfce7;
         color: #166534;
-        padding: 3px 9px;
+        padding: 4px 10px;
         border-radius: 4px;
-        font-size: 0.76rem;
+        font-size: 0.78rem;
         font-weight: 700;
         border: 1px solid #86efac;
         margin-left: 6px;
+        font-family: 'Montserrat', sans-serif !important;
     }
     .badge-superseded-gov {
         background-color: #fef3c7;
         color: #92400e;
-        padding: 3px 9px;
+        padding: 4px 10px;
         border-radius: 4px;
-        font-size: 0.76rem;
+        font-size: 0.78rem;
         font-weight: 700;
         border: 1px solid #fde68a;
         margin-left: 6px;
+        font-family: 'Montserrat', sans-serif !important;
     }
     .badge-qco-gov {
         background-color: #fee2e2;
         color: #991b1b;
-        padding: 3px 9px;
+        padding: 4px 10px;
         border-radius: 4px;
-        font-size: 0.76rem;
+        font-size: 0.78rem;
         font-weight: 700;
         border: 1px solid #f87171;
         margin-left: 6px;
+        font-family: 'Montserrat', sans-serif !important;
     }
     .badge-voluntary-gov {
         background-color: #f1f5f9;
         color: #334155;
-        padding: 3px 9px;
+        padding: 4px 10px;
         border-radius: 4px;
-        font-size: 0.76rem;
+        font-size: 0.78rem;
         font-weight: 700;
         border: 1px solid #cbd5e1;
         margin-left: 6px;
+        font-family: 'Montserrat', sans-serif !important;
     }
 
     /* Normative Test Tags */
@@ -320,7 +343,7 @@ st.markdown("""
         border-radius: 4px;
         padding: 6px 12px;
         margin: 4px 6px 4px 0;
-        font-size: 0.83rem;
+        font-size: 0.84rem;
         color: #0f172a;
     }
 
@@ -329,18 +352,19 @@ st.markdown("""
         width: 100%;
         border-collapse: collapse;
         margin: 10px 0 16px 0;
-        font-size: 0.85rem;
+        font-size: 0.86rem;
     }
     .param-table th {
         background: #f1f5f9;
         color: #071e3d;
         font-weight: 700;
-        padding: 8px 12px;
+        padding: 9px 12px;
         text-align: left;
         border: 1px solid #cbd5e1;
+        font-family: 'Montserrat', sans-serif !important;
     }
     .param-table td {
-        padding: 8px 12px;
+        padding: 9px 12px;
         border: 1px solid #e2e8f0;
         color: #1e293b;
     }
@@ -356,7 +380,7 @@ st.markdown("""
         border-radius: 6px;
         padding: 12px 16px;
         margin: 12px 0;
-        font-size: 0.86rem;
+        font-size: 0.88rem;
         color: #7f1d1d;
     }
 
@@ -367,7 +391,7 @@ st.markdown("""
         border-radius: 6px;
         padding: 10px 14px;
         margin-top: 12px;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #334155;
         display: flex;
         justify-content: space-between;
@@ -378,10 +402,10 @@ st.markdown("""
     .stamp-badge {
         background: #071e3d;
         color: #ffffff;
-        padding: 2px 8px;
+        padding: 3px 9px;
         border-radius: 4px;
         font-weight: 700;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: 'JetBrains Mono', monospace !important;
     }
 
     /* Official Footer */
@@ -392,12 +416,13 @@ st.markdown("""
         border-top: 4px solid #FF9933;
         margin-top: 40px;
         border-radius: 8px 8px 0 0;
-        font-size: 0.82rem;
+        font-size: 0.83rem;
         line-height: 1.6;
     }
     .gov-footer a {
         color: #38bdf8;
         text-decoration: none;
+        font-weight: 500;
     }
     .gov-footer a:hover {
         text-decoration: underline;
