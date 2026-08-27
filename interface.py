@@ -1,8 +1,7 @@
 """
 BIS Standards Recommendation & Compliance Engine — Streamlit UI
 Government of India (GoI) & GIGW 3.0 Compliant National Regulatory Intelligence Portal
-Typography inspired by the Official Smart India Hackathon (SIH) Portal (Montserrat + Poppins + Noto Sans Devanagari)
-Developed by Team BYTEMINDS for Smart India Hackathon (SIH)
+Typography: Montserrat (Headings) + Poppins (UI Body) + Noto Sans Devanagari (Indic)
 """
 
 import time
@@ -47,20 +46,37 @@ def compute_sha256(text: str) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🎨 SIH 2024 & GIGW 3.0 Typography & Design System (Custom CSS)
+# 🎨 GIGW 3.0 Typography & Design System (Custom CSS)
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
-    /* Google Fonts: Montserrat (SIH Branding & Headings) + Poppins (UI Body) + Noto Sans Devanagari (Indic) */
+    /* Google Fonts: Montserrat (Headings) + Poppins (UI Body) + Noto Sans Devanagari (Indic) */
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
-    /* Global Typography - SIH Inspiration */
-    html, body, [class*="css"], .stMarkdown, .stText, p, span, label, div {
-        font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    /* 1. Protect Streamlit Material Symbols / Material Icons from font overrides */
+    [data-testid="stIcon"],
+    [data-testid="stSidebarCollapseButton"] *,
+    [data-testid="stSidebarCollapseButton"] span,
+    .material-symbols-rounded,
+    [class*="material-symbols"],
+    [class*="material-icons"],
+    span[data-testid="stIconMaterial"] {
+        font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+        font-feature-settings: 'liga' 1;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr !important;
+    }
+
+    /* 2. Global Typography (Targeted to prevent icon breakage) */
+    .stApp, .stMarkdown, .stText, p, label, input, textarea, select {
+        font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
         color: #1e293b;
     }
     
-    /* Headings with Montserrat (Bold, Energetic SIH Aesthetic) */
+    /* Headings with Montserrat */
     h1, h2, h3, h4, h5, h6, .gov-title-en, .std-code-title, .search-label, .rank-tag, .section-heading {
         font-family: 'Montserrat', 'Poppins', sans-serif !important;
         letter-spacing: -0.3px;
@@ -96,7 +112,7 @@ st.markdown("""
     .gigw-top-right {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         font-size: 0.76rem;
     }
     .gigw-pill {
@@ -190,6 +206,66 @@ st.markdown("""
         box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }
 
+    /* Sidebar Clean Styling */
+    [data-testid="stSidebar"] {
+        background-color: #f8fafc;
+        border-right: 1px solid #e2e8f0;
+    }
+    .sidebar-header-card {
+        background: linear-gradient(135deg, #071e3d 0%, #1e3a8a 100%);
+        color: white;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 6px rgba(7,30,61,0.15);
+    }
+    .sidebar-header-title {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sidebar-header-sub {
+        font-size: 0.78rem;
+        color: #cbd5e1;
+        margin-top: 4px;
+    }
+    .sidebar-section-title {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #071e3d;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin: 14px 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    [data-testid="stSidebar"] .stButton > button {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #0f172a;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-align: left;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        width: 100%;
+        margin-bottom: 4px;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background: #f1f5f9;
+        border-color: #071e3d;
+        color: #071e3d;
+        transform: translateY(-1px);
+    }
+
     /* Search Box & Controls */
     .search-panel {
         background: #ffffff;
@@ -210,7 +286,7 @@ st.markdown("""
         gap: 6px;
     }
 
-    /* Metric Summary Dashboard (SIH Styled) */
+    /* Metric Summary Dashboard */
     .metric-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -442,9 +518,9 @@ st.markdown("""
         <span>उपभोक्ता मामले, खाद्य एवं सार्वजनिक वितरण मंत्रालय</span>
     </div>
     <div class="gigw-top-right">
-        <span class="gigw-pill">Smart India Hackathon 2024</span>
         <span class="gigw-pill">GIGW 3.0 Compliant</span>
-        <span class="gigw-pill">Team BYTEMINDS</span>
+        <span class="gigw-pill">BIS Act 2016</span>
+        <span class="gigw-pill">National Regulatory Portal</span>
     </div>
 </div>
 <div class="tricolor-stripe"></div>
@@ -477,58 +553,60 @@ st.markdown("""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ⚙️ Sidebar Navigation & Settings
+# ⚙️ Clean Redesigned Sidebar
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 🏛️ Bureau Control Center")
-    st.caption("Configure retrieval parameters and regulatory filters:")
+    st.markdown("""
+    <div class="sidebar-header-card">
+        <div class="sidebar-header-title">⚙️ Control Center</div>
+        <div class="sidebar-header-sub">Search parameters & regulatory filter settings</div>
+    </div>
+    """, unsafe_allow_html=True)
 
+    st.markdown('<div class="sidebar-section-title">🛡️ AI & Retrieval Settings</div>', unsafe_allow_html=True)
     enable_validation = st.checkbox(
-        "🤖 Enable LLM Guardrail (Ollama)",
+        "Enable LLM Guardrail (Ollama)",
         value=False,
-        help="Use Ollama (phi:2.7b) to filter out queries unrelated to construction materials"
+        help="Filters out queries unrelated to construction materials using Ollama (phi:2.7b)"
     )
-    top_k = st.slider("📊 Recommendations (Top-K)", min_value=3, max_value=8, value=5)
+    
+    top_k = st.slider("Recommendations Count (Top-K)", min_value=3, max_value=8, value=5)
 
-    st.divider()
-    st.markdown("#### 📚 Quick Vernacular Queries")
-    st.caption("Test multi-lingual and regional site terminology:")
+    st.markdown('<div class="sidebar-section-title">📚 Quick Vernacular Queries</div>', unsafe_allow_html=True)
+    st.caption("Click any preset query to test regional & vernacular recognition:")
 
     quick_queries = [
-        ("सरिया Fe 500D (TMT Rebar)", "सरिया 16mm Fe 500D (TMT Rebar)"),
-        ("छत की सीमेंट (Roof Slab Concrete)", "छत की सीमेंट (Roof Slab Concrete)"),
-        ("बालू व कंक्रीट रेत (Aggregates)", "बालू और कंक्रीट रेत (Fine Aggregates)"),
-        ("OPC 53 Grade Cement", "Ordinary Portland Cement 53 Grade"),
-        ("Prestressed Concrete Girders", "Prestressed Concrete Bridge Girders"),
-        ("Ready-Mixed Concrete (RMC)", "Ready-Mixed Concrete Batching Plant")
+        ("सरिया Fe 500D", "TMT Rebar (IS 1786)", "सरिया 16mm Fe 500D (TMT Rebar)"),
+        ("छत की सीमेंट", "Roof Slab OPC 53 (IS 269)", "छत की सीमेंट (Roof Slab Concrete)"),
+        ("बालू व कंक्रीट रेत", "Fine Aggregates (IS 383)", "बालू और कंक्रीट रेत (Fine Aggregates)"),
+        ("OPC 53 Grade", "High Strength Cement", "Ordinary Portland Cement 53 Grade"),
+        ("Prestressed Girders", "Bridge Concrete (IS 1343)", "Prestressed Concrete Bridge Girders"),
+        ("Ready-Mixed Concrete", "RMC Plant (IS 4926)", "Ready-Mixed Concrete Batching Plant")
     ]
 
-    for label, q_text in quick_queries:
-        if st.button(f"👉 {label}", use_container_width=True):
-            st.session_state["query_input"] = q_text
+    for hi_term, en_sub, full_q in quick_queries:
+        if st.button(f"🔍 {hi_term} — {en_sub}", use_container_width=True, key=f"q_{hi_term}"):
+            st.session_state["query_input"] = full_q
             st.rerun()
 
-    st.divider()
+    st.markdown('<div class="sidebar-section-title">🏛️ Verified Engine Protocols</div>', unsafe_allow_html=True)
     st.markdown("""
-    **Portal Features & Protocols:**
-    - ✅ **Hybrid BM25 + Dense Embeddings**
-    - ✅ **Lifecycle & Revisions (IS 269:2015)**
-    - ✅ **Normative Tests (IS 4031 / 4032 / 2386)**
-    - ✅ **Statutory QCOs & ISI Scheme-I**
-    - ✅ **Indic / Vernacular Normalization**
-    - ✅ **GeM / CPWD Tender Clause Generator**
-    - ✅ **Cryptographic Tamper-Proof Stamp**
+    - ⚡ **Hybrid BM25 + Embeddings**
+    - 🔄 **Consolidated Lifecycle (IS 269:2015)**
+    - 🔬 **Normative Tests (IS 4031/32/2386)**
+    - 🛑 **Statutory QCOs & Scheme-I ISI**
+    - 🌐 **Indic / Multilingual NLP**
+    - 🔒 **SHA-256 Cryptographic Stamp**
     """)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 📑 Main Navigation Tabs
 # ─────────────────────────────────────────────────────────────────────────────
-tab_search, tab_compare, tab_registry, tab_credits = st.tabs([
+tab_search, tab_compare, tab_registry = st.tabs([
     "🔍 Smart Search & Complete Specification",
     "🔄 Side-by-Side Scope Comparator",
-    "📜 Standards & QCO Registry Browser",
-    "👥 Team BYTEMINDS & Credentials"
+    "📜 Standards & QCO Registry Browser"
 ])
 
 
@@ -925,35 +1003,6 @@ with tab_registry:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ── TAB 4: Team BYTEMINDS & Credentials
-# ─────────────────────────────────────────────────────────────────────────────
-with tab_credits:
-    st.markdown("""
-    <div style="background: white; border: 1px solid #cbd5e1; border-top: 4px solid #071e3d; border-radius: 8px; padding: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-        <h2 style="color: #071e3d; margin-top: 0;">👥 Developed by Team BYTEMINDS</h2>
-        <h4 style="color: #b45309; margin-top: -8px;">🏆 Smart India Hackathon (SIH) 2024 — Bureau of Indian Standards (BIS)</h4>
-        <hr style="margin: 16px 0; border: none; border-top: 1px solid #e2e8f0;">
-        
-        <h4 style="color: #071e3d;">🚀 Core Technological Innovations & Architectural Pillars:</h4>
-        <ol style="line-height: 1.8; font-size: 0.95rem; color: #334155;">
-            <li><strong>Hybrid Retrieval Architecture:</strong> Okapi BM25 Lexical Matching fused with Dense Contextual Semantic Embeddings (<code>all-MiniLM-L6-v2</code>) with Reciprocal Rank Fusion re-ranking.</li>
-            <li><strong>Lifecycle Currency Engine:</strong> Real-time status resolution of superseded historical standards (e.g. <code>IS 8112</code> / <code>IS 12269</code> consolidated into <code>IS 269:2015</code>) and gazette amendment tracking.</li>
-            <li><strong>Normative Reference Knowledge Graph:</strong> Relational resolution of mandatory acceptance test standards (<code>IS 4031</code>, <code>IS 4032</code>, <code>IS 2386</code>, <code>IS 1608</code>) and allied codes of practice (<code>IS 456</code>, <code>IS 4926</code>).</li>
-            <li><strong>Quantitative Parameter Extraction:</strong> Structured material threshold extraction for compressive strengths, setting times, soundness, and chemical limits.</li>
-            <li><strong>Statutory QCO Compliance & Penal Enforcement:</strong> DPIIT/Ministry Quality Control Order enforcement, Scheme-I Mandatory ISI mark validation, and BIS Act 2016 Section 29 legal notices.</li>
-            <li><strong>Indic & Multilingual NLP Normalizer:</strong> Zero-shot vernacular normalization for Hindi (Devanagari script), Hinglish, and regional construction terminology.</li>
-            <li><strong>Side-by-Side Scope Comparator:</strong> Multi-attribute disambiguation matrix for overlapping construction codes.</li>
-            <li><strong>GeM / CPWD Tender Clause & QA Generator:</strong> Automated generation of public procurement specifications with SHA-256 cryptographic provenance stamps and interactive inspection checklists.</li>
-        </ol>
-        <hr style="margin: 16px 0; border: none; border-top: 1px solid #e2e8f0;">
-        <div style="font-size: 0.85rem; color: #64748b;">
-            Built with <strong>Python, Streamlit, PyTorch, Sentence-Transformers, Rank-BM25, and Ollama (Phi-2.7B)</strong>.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # 🇮🇳 Official Government Footer
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -980,7 +1029,7 @@ st.markdown("""
     </div>
     <hr style="border-color: #1e3a8a; margin: 16px 0 10px 0;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.76rem; color: #64748b;">
-        <div>© 2024–2026 Team BYTEMINDS. Built for Smart India Hackathon. All rights reserved.</div>
+        <div>© Bureau of Indian Standards (BIS), Ministry of Consumer Affairs, Food & Public Distribution. All rights reserved.</div>
         <div>Compliant with GIGW 3.0 & Open Standards Policy.</div>
     </div>
 </div>
