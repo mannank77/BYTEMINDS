@@ -203,8 +203,11 @@ st.markdown("""
     }
 
     /* 2. Global Typography in Light Mode */
-    .stApp, .stMarkdown, .stText, p, label, span, div {
+    .stApp {
         font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #0f172a;
+    }
+    .stMarkdown p, .stText, label, li {
         color: #0f172a;
     }
     
@@ -782,7 +785,10 @@ if dark_mode:
         background-color: #0b1120 !important;
         color: #f1f5f9 !important;
     }
-    .stApp, .stMarkdown, .stText, p, label, span, div {
+    .stApp {
+        color: #f1f5f9 !important;
+    }
+    .stMarkdown p, .stText, label, li {
         color: #f1f5f9;
     }
     /* Headings */
