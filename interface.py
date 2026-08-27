@@ -72,12 +72,12 @@ TRANSLATIONS = {
         "metric_latency": "Hybrid Search & Graph Latency",
         "metric_qco": "QCO Scheme-I Verification",
         "metric_offline": "Air-Gapped & Zero-Data-Leakage",
-        "sidebar_control": "Control Center",
+        "sidebar_control": "Control & Filter Panel",
         "sidebar_control_sub": "Search parameters & regulatory filter settings",
         "sidebar_guardrail": "Enable LLM Guardrail (Ollama)",
         "sidebar_topk": "Recommendations Count (Top-K)",
-        "sidebar_quick_queries": "Quick Technical Queries",
-        "sidebar_protocols": "Verified Engine Protocols",
+        "sidebar_quick_queries": "Standard Technical Queries",
+        "sidebar_protocols": "Engine Verification Protocols",
         "badge_active": "ACTIVE",
         "badge_superseded": "SUPERSEDED BY",
         "badge_qco": "MANDATORY QCO (ISI MARK)",
@@ -109,12 +109,12 @@ TRANSLATIONS = {
         "metric_latency": "खोज एवं विश्लेषण विलंबता",
         "metric_qco": "QCO स्कीम-I सत्यापन",
         "metric_offline": "100% ऑफ़लाइन / डेटा सुरक्षा",
-        "sidebar_control": "नियंत्रण केंद्र",
+        "sidebar_control": "नियंत्रण एवं फ़िल्टर पैनल",
         "sidebar_control_sub": "खोज पैरामीटर एवं विनियामक फ़िल्टर",
         "sidebar_guardrail": "LLM गार्डरेल सक्षम करें (Ollama)",
         "sidebar_topk": "सिफारिशों की संख्या (Top-K)",
-        "sidebar_quick_queries": "त्वरित तकनीकी प्रश्न",
-        "sidebar_protocols": "सत्यापित इंजन प्रोटोकॉल",
+        "sidebar_quick_queries": "मानक तकनीकी प्रश्न",
+        "sidebar_protocols": "इंजन सत्यापन प्रोटोकॉल",
         "badge_active": "सक्रिय",
         "badge_superseded": "द्वारा प्रतिस्थापित",
         "badge_qco": "अनिवार्य QCO (ISI मार्क)",
@@ -335,44 +335,44 @@ st.markdown("""
         margin-bottom: 12px;
     }
 
-    /* Sidebar Clean Styling */
+    /* Sidebar Clean Styling — Matching Main Portal Masthead */
     [data-testid="stSidebar"] {
         background-color: #f8fafc;
         border-right: 1px solid #e2e8f0;
     }
-    .sidebar-header-card {
-        background: linear-gradient(135deg, #071e3d 0%, #1e3a8a 100%);
-        color: white;
-        padding: 14px 16px;
-        border-radius: 8px;
+    .sidebar-header-box {
+        padding: 4px 0 14px 0;
+        border-bottom: 2px solid #e2e8f0;
         margin-bottom: 16px;
-        box-shadow: 0 2px 6px rgba(7,30,61,0.15);
     }
     .sidebar-header-title {
         font-family: 'Montserrat', sans-serif !important;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .sidebar-header-sub {
-        font-size: 0.78rem;
-        color: #cbd5e1;
-        margin-top: 4px;
-    }
-    .sidebar-section-title {
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 0.82rem;
-        font-weight: 700;
+        font-size: 1.15rem;
+        font-weight: 800;
         color: #071e3d;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        margin: 14px 0 8px 0;
+        letter-spacing: -0.3px;
+        line-height: 1.25;
         display: flex;
         align-items: center;
         gap: 6px;
+    }
+    .sidebar-header-sub {
+        font-size: 0.78rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-top: 3px;
+        line-height: 1.35;
+    }
+    .sidebar-section-title {
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #071e3d;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        margin: 18px 0 10px 0;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #e2e8f0;
     }
     [data-testid="stSidebar"] .stButton > button {
         background: #ffffff;
@@ -706,13 +706,13 @@ st.markdown(f"""
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"""
-    <div class="sidebar-header-card">
-        <div class="sidebar-header-title">⚙️ {T['sidebar_control']}</div>
+    <div class="sidebar-header-box">
+        <div class="sidebar-header-title">{T['sidebar_control']}</div>
         <div class="sidebar-header-sub">{T['sidebar_control_sub']}</div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="sidebar-section-title">🛡️ AI & Retrieval Settings</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sidebar-section-title">AI & Retrieval Configuration</div>', unsafe_allow_html=True)
     enable_validation = st.checkbox(
         T["sidebar_guardrail"],
         value=False,
@@ -721,7 +721,7 @@ with st.sidebar:
     
     top_k = st.slider(T["sidebar_topk"], min_value=3, max_value=8, value=5)
 
-    st.markdown(f'<div class="sidebar-section-title">📚 {T["sidebar_quick_queries"]}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sidebar-section-title">{T["sidebar_quick_queries"]}</div>', unsafe_allow_html=True)
     st.caption("Click any preset query to test standard retrieval:")
 
     quick_queries = [
@@ -738,7 +738,7 @@ with st.sidebar:
             st.session_state["query_input"] = full_q
             st.rerun()
 
-    st.markdown(f'<div class="sidebar-section-title">🏛️ {T["sidebar_protocols"]}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sidebar-section-title">{T["sidebar_protocols"]}</div>', unsafe_allow_html=True)
     st.markdown("""
     - ⚡ **Hybrid BM25 + Dense Embeddings**
     - 🔄 **Consolidated Lifecycle (IS 269:2015)**
