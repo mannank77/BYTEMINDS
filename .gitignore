@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+venv/
+ppp/
+.env
+.codex
+
+team_results.json
+*.tmp

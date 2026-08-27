@@ -1,0 +1,101 @@
+{
+  "IS 269": {
+    "is_mandatory": true,
+    "certification_scheme": "Scheme-I (BIS ISI Certification Mark)",
+    "qco_name": "Cement (Quality Control) Order",
+    "issuing_ministry": "Department for Promotion of Industry and Internal Trade (DPIIT), Ministry of Commerce and Industry",
+    "legal_status": "MANDATORY UNDER LAW",
+    "gazette_order_reference": "S.O. 4504(E) / Cement QCO Mandate",
+    "statutory_provisions": "Section 16 & Section 29 of the Bureau of Indian Standards Act, 2016.",
+    "penalties_and_consequences": "Any person who manufactures, imports, sells, distributes, or stores cement without a valid BIS ISI Certification Mark is liable for imprisonment up to two years or a minimum fine of ₹2,00,000 or both, along with confiscation of goods.",
+    "exemption_policy": "No general commercial exemptions. All imported and domestic production must hold valid BIS Standard Mark."
+  },
+  "IS 1489 (Part 1)": {
+    "is_mandatory": true,
+    "certification_scheme": "Scheme-I (BIS ISI Certification Mark)",
+    "qco_name": "Cement (Quality Control) Order",
+    "issuing_ministry": "DPIIT, Ministry of Commerce and Industry",
+    "legal_status": "MANDATORY UNDER LAW",
+    "gazette_order_reference": "Cement Quality Control Order Enforcement",
+    "statutory_provisions": "Sections 16, 17 & 29 of the BIS Act, 2016.",
+    "penalties_and_consequences": "Mandatory BIS license required for manufacturing and distribution. Strict penal provisions under BIS Act 2016.",
+    "exemption_policy": "None"
+  },
+  "IS 1489 (Part 2)": {
+    "is_mandatory": true,
+    "certification_scheme": "Scheme-I (BIS ISI Certification Mark)",
+    "qco_name": "Cement (Quality Control) Order",
+    "issuing_ministry": "DPIIT, Ministry of Commerce and Industry",
+    "legal_status": "MANDATORY UNDER LAW",
+    "gazette_order_reference": "Cement QCO 2020",
+    "statutory_provisions": "BIS Act 2016 Sections 16 & 29",
+    "penalties_and_consequences": "Strict compliance required. ISI mark mandatory on all packaging bags.",
+    "exemption_policy": "None"
+  },
+  "IS 455": {
+    "is_mandatory": true,
+    "certification_scheme": "Scheme-I (BIS ISI Certification Mark)",
+    "qco_name": "Cement (Quality Control) Order",
+    "issuing_ministry": "DPIIT, Ministry of Commerce and Industry",
+    "legal_status": "MANDATORY UNDER LAW",
+    "gazette_order_reference": "DPIIT Cement Quality Control Order",
+    "statutory_provisions": "BIS Act 2016 Sections 16 & 29",
+    "penalties_and_consequences": "Mandatory ISI mark. Non-compliant stock subject to seizure and criminal prosecution.",
+    "exemption_policy": "None"
+  },
+  "IS 1786": {
+    "is_mandatory": true,
+    "certification_scheme": "Scheme-I (BIS ISI Certification Mark)",
+    "qco_name": "Steel and Steel Products (Quality Control) Order",
+    "issuing_ministry": "Ministry of Steel, Government of India",
+    "legal_status": "MANDATORY UNDER LAW",
+    "gazette_order_reference": "Steel & Steel Products (QCO) S.O. 1671(E)",
+    "statutory_provisions": "Section 16 of the BIS Act, 2016 read with Ministry of Steel mandates.",
+    "penalties_and_consequences": "Total ban on non-ISI certified rebar/TMT production, rolling, stocking, and supply. Heavy fines and legal prosecution under Section 29.",
+    "exemption_policy": "Exemptions only granted on specific non-substitutable capital equipment steel by Ministry of Steel Technical Committee."
+  },
+  "IS 456": {
+    "is_mandatory": false,
+    "certification_scheme": "National Code of Practice (Statutory via NBC & Municipal Bylaws)",
+    "qco_name": "National Building Code (NBC) / State Municipal By-Laws Mandate",
+    "issuing_ministry": "Ministry of Housing and Urban Affairs (MoHUA) / State Urban Local Bodies",
+    "legal_status": "MANDATORY CODE OF PRACTICE IN BUILDING BY-LAWS",
+    "gazette_order_reference": "NBC 2016 Part 6 Structural Design",
+    "statutory_provisions": "State Municipal Corporation Acts & Structural Safety Bylaws.",
+    "penalties_and_consequences": "Structural engineers and contractors are liable for structural failure, criminal negligence, and cancellation of license if design departs from IS 456 without peer-reviewed sanction.",
+    "exemption_policy": "Special structures with international peer review."
+  },
+  "IS 1343": {
+    "is_mandatory": false,
+    "certification_scheme": "Code of Practice (Statutory for PSC Infrastructure Projects)",
+    "qco_name": "MoRTH / NHAI / Indian Railways Concrete Bridge Standards",
+    "issuing_ministry": "Ministry of Road Transport and Highways (MoRTH) & Ministry of Railways",
+    "legal_status": "MANDATORY CONTRACTUAL STANDARD FOR INFRASTRUCTURE",
+    "gazette_order_reference": "MoRTH Specification Clause 1700",
+    "statutory_provisions": "Indian Highways & Railways Statutory Quality Specifications.",
+    "penalties_and_consequences": "Rejection of PSC girders and debarment from government contracts for non-compliance.",
+    "exemption_policy": "None for standard highway/rail bridges."
+  },
+  "IS 4926": {
+    "is_mandatory": true,
+    "certification_scheme": "Scheme-I (Ready-Mixed Concrete Plant Certification Scheme - RMCPCS)",
+    "qco_name": "Quality Control Criteria for Ready Mixed Concrete Plants",
+    "issuing_ministry": "Quality Council of India (QCI) & BIS",
+    "legal_status": "MANDATORY IN CPWD / METRO RAIL / SMART CITIES TENDERS",
+    "gazette_order_reference": "CPWD Specifications 2019 Vol 1 Clause 4.2",
+    "statutory_provisions": "Government Procurement Rules (GFR) Rule 144.",
+    "penalties_and_consequences": "Ineligibility to supply concrete for public infrastructure projects without valid RMCPCS certification.",
+    "exemption_policy": "Site-specific captive batching plants with approved QA manuals."
+  },
+  "IS 383": {
+    "is_mandatory": false,
+    "certification_scheme": "Voluntary Product Certification / Mandatory in Public Works Specifications",
+    "qco_name": "CPWD & State PWD Standard Specifications for Aggregates",
+    "issuing_ministry": "MoHUA / CPWD",
+    "legal_status": "MANDATORY UNDER CPWD & NHAI PROCUREMENT SPECIFICATIONS",
+    "gazette_order_reference": "CPWD Works Manual Clause 5.3",
+    "statutory_provisions": "Mandatory testing protocol prior to concrete mix acceptance.",
+    "penalties_and_consequences": "Rejection of aggregate quarry source and quarry supply bans on failure of 5-cycle soundness or alkali-reactivity tests.",
+    "exemption_policy": "None"
+  }
+}

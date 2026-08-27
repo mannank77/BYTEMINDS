@@ -1,0 +1,10 @@
+streamlit
+ollama
+pypdf
+sentence-transformers
+numpy
+
+
+torch
+torchvision
+

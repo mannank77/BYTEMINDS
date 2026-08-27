@@ -1,0 +1,278 @@
+{
+  "IS 269": {
+    "base_code": "IS 269",
+    "title": "Ordinary Portland Cement (33, 43 and 53 Grade)",
+    "current_version": "IS 269: 2015",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 269: 1989",
+        "title": "33 Grade Ordinary Portland Cement",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 269: 2015",
+        "revision_number": 4
+      },
+      {
+        "code": "IS 8112: 1989",
+        "title": "43 Grade Ordinary Portland Cement",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 269: 2015",
+        "revision_number": 2
+      },
+      {
+        "code": "IS 12269: 1987",
+        "title": "53 Grade Ordinary Portland Cement",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 269: 2015",
+        "revision_number": 1
+      }
+    ],
+    "consolidation_summary": "In the 2015 revision, IS 269, IS 8112 (43 Grade), and IS 12269 (53 Grade) were unified into a single comprehensive standard IS 269:2015 covering 33, 43, and 53 grades of OPC.",
+    "latest_amendments": [
+      {
+        "amendment_no": 1,
+        "year": 2018,
+        "summary": "Permissible performance improvers and mineral admixture inclusion thresholds revised."
+      },
+      {
+        "amendment_no": 2,
+        "year": 2021,
+        "summary": "Updated packaging norms, net mass tolerance, and eco-labeling requirements."
+      }
+    ]
+  },
+  "IS 383": {
+    "base_code": "IS 383",
+    "title": "Coarse and Fine Aggregate for Concrete — Specification",
+    "current_version": "IS 383: 2016",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 383: 1970",
+        "title": "Coarse and Fine Aggregates from Natural Sources for Concrete (Second Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 383: 2016",
+        "revision_number": 2
+      }
+    ],
+    "consolidation_summary": "IS 383:2016 (Third Revision) expanded scope significantly beyond natural sources to include Manufactured Sand (M-Sand), Recycled Concrete Aggregate (RCA), Recycled Aggregate (RA), and Iron/Steel Slag Aggregates.",
+    "latest_amendments": [
+      {
+        "amendment_no": 1,
+        "year": 2019,
+        "summary": "Fine aggregate grading limits and micro-fines percentage passing for Crushed Stone Sand (M-Sand) updated."
+      }
+    ]
+  },
+  "IS 456": {
+    "base_code": "IS 456",
+    "title": "Plain and Reinforced Concrete — Code of Practice",
+    "current_version": "IS 456: 2000 (Reaffirmed 2021)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 456: 1978",
+        "title": "Code of Practice for Plain and Reinforced Concrete (Third Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 456: 2000",
+        "revision_number": 3
+      }
+    ],
+    "consolidation_summary": "IS 456:2000 introduces durability-based mix design guidelines, exposure condition categorization (Mild, Moderate, Severe, Very Severe, Extreme), and minimum cement content provisions.",
+    "latest_amendments": [
+      {
+        "amendment_no": 1,
+        "year": 2004,
+        "summary": "Clarifications on design bond stress and anchorage length for deformed bars."
+      },
+      {
+        "amendment_no": 5,
+        "year": 2019,
+        "summary": "Allowing use of Recycled Concrete Aggregate (RCA) up to 20% in reinforced concrete and 100% in plain concrete."
+      }
+    ]
+  },
+  "IS 1489 (Part 1)": {
+    "base_code": "IS 1489 (Part 1)",
+    "title": "Portland Pozzolana Cement — Specification (Part 1: Fly Ash Based)",
+    "current_version": "IS 1489 (Part 1): 2015",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 1489 (Part 1): 1991",
+        "title": "Portland Pozzolana Cement Part 1 Fly Ash Based (Third Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 1489 (Part 1): 2015",
+        "revision_number": 3
+      }
+    ],
+    "consolidation_summary": "Fly ash replacement ratio defined between 15% and 35% with enhanced fineness requirements and updated test reference standards.",
+    "latest_amendments": [
+      {
+        "amendment_no": 2,
+        "year": 2021,
+        "summary": "Standardization of packaging sizes and environmental product declaration criteria."
+      }
+    ]
+  },
+  "IS 1489 (Part 2)": {
+    "base_code": "IS 1489 (Part 2)",
+    "title": "Portland Pozzolana Cement — Specification (Part 2: Calcined Clay Based)",
+    "current_version": "IS 1489 (Part 2): 2015",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 1489 (Part 2): 1991",
+        "title": "Portland Pozzolana Cement Part 2 Calcined Clay Based (Third Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 1489 (Part 2): 2015",
+        "revision_number": 3
+      }
+    ],
+    "consolidation_summary": "Covers calcined clay pozzolana admixture requirements, offering high resistance to sulphate attack.",
+    "latest_amendments": []
+  },
+  "IS 455": {
+    "base_code": "IS 455",
+    "title": "Portland Slag Cement — Specification",
+    "current_version": "IS 455: 2015",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 455: 1989",
+        "title": "Portland Slag Cement (Fourth Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 455: 2015",
+        "revision_number": 4
+      }
+    ],
+    "consolidation_summary": "Covers blast furnace slag based Portland cement with slag ratio between 25% and 70%, ideal for marine and wastewater applications.",
+    "latest_amendments": []
+  },
+  "IS 1786": {
+    "base_code": "IS 1786",
+    "title": "High Strength Deformed Steel Bars and Wires for Concrete Reinforcement — Specification",
+    "current_version": "IS 1786: 2008 (Reaffirmed 2018)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 1786: 1985",
+        "title": "Specification for High Strength Deformed Steel Bars and Wires (Third Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 1786: 2008",
+        "revision_number": 3
+      }
+    ],
+    "consolidation_summary": "Introduced Fe 500D, Fe 550D, Fe 600 grades with enhanced elongation and ductile characteristics for seismic zones.",
+    "latest_amendments": [
+      {
+        "amendment_no": 3,
+        "year": 2019,
+        "summary": "Mandatory micro-alloying and carbon equivalent ceilings for superior weldability."
+      }
+    ]
+  },
+  "IS 1343": {
+    "base_code": "IS 1343",
+    "title": "Prestressed Concrete — Code of Practice",
+    "current_version": "IS 1343: 2012",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 1343: 1980",
+        "title": "Code of Practice for Prestressed Concrete (First Revision)",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 1343: 2012",
+        "revision_number": 1
+      }
+    ],
+    "consolidation_summary": "Updated limit state design method for prestressed concrete elements, loss of prestress formulas, and shear design.",
+    "latest_amendments": []
+  },
+  "IS 4926": {
+    "base_code": "IS 4926",
+    "title": "Ready-Mixed Concrete — Code of Practice",
+    "current_version": "IS 4926: 2003 (Reaffirmed 2019)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [
+      {
+        "code": "IS 4926: 1976",
+        "title": "Specification for Ready-Mixed Concrete",
+        "status": "SUPERSEDED",
+        "superseded_by": "IS 4926: 2003",
+        "revision_number": 1
+      }
+    ],
+    "consolidation_summary": "Covers ordering, production, transportation, quality control, sampling and testing for Ready-Mixed Concrete (RMC).",
+    "latest_amendments": []
+  },
+  "IS 2116": {
+    "base_code": "IS 2116",
+    "title": "Sand for Masonry Mortars — Specification",
+    "current_version": "IS 2116: 1980 (Reaffirmed 2021)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [],
+    "consolidation_summary": "Covers grading and deleterious materials limits for natural and crushed stone sand used in masonry mortars.",
+    "latest_amendments": []
+  },
+  "IS 3466": {
+    "base_code": "IS 3466",
+    "title": "Masonry Cement — Specification",
+    "current_version": "IS 3466: 1988 (Reaffirmed 2019)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [],
+    "consolidation_summary": "Specification for masonry cement intended for non-structural masonry mortars and plastering works.",
+    "latest_amendments": []
+  },
+  "IS 6452": {
+    "base_code": "IS 6452",
+    "title": "High Alumina Cement for Structural Use — Specification",
+    "current_version": "IS 6452: 1989 (Reaffirmed 2019)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [],
+    "consolidation_summary": "High early-strength refractory and cold-weather cement specification.",
+    "latest_amendments": []
+  },
+  "IS 6909": {
+    "base_code": "IS 6909",
+    "title": "Supersulphated Cement — Specification",
+    "current_version": "IS 6909: 1990 (Reaffirmed 2019)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [],
+    "consolidation_summary": "Specialized cement for marine structures, sulphate-bearing soils, and acidic industrial effluent channels.",
+    "latest_amendments": []
+  },
+  "IS 1077": {
+    "base_code": "IS 1077",
+    "title": "Common Burnt Clay Building Bricks — Specification",
+    "current_version": "IS 1077: 1992 (Reaffirmed 2021)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [],
+    "consolidation_summary": "Specifies physical dimensions, compressive strength classes (3.5 to 35 MPa), and water absorption for burnt clay bricks.",
+    "latest_amendments": []
+  },
+  "IS 12894": {
+    "base_code": "IS 12894",
+    "title": "Pulverized Fuel Ash-Lime Bricks — Specification",
+    "current_version": "IS 12894: 2002 (Reaffirmed 2020)",
+    "status": "ACTIVE",
+    "is_current": true,
+    "historical_versions": [],
+    "consolidation_summary": "Specifies quality, compressive strength, and durability for eco-friendly fly ash-lime building bricks.",
+    "latest_amendments": []
+  }
+}

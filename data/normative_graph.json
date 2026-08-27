@@ -1,0 +1,418 @@
+{
+  "IS 269": {
+    "primary_standard": "IS 269: 2015",
+    "title": "Ordinary Portland Cement (33, 43, 53 Grade)",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 4031 (Part 1)",
+        "title": "Methods of physical tests for hydraulic cement: Determination of fineness by dry sieving",
+        "requirement_type": "Mandatory QA Test"
+      },
+      {
+        "code": "IS 4031 (Part 2)",
+        "title": "Determination of fineness by specific surface by air permeability method (Blaine's apparatus)",
+        "requirement_type": "Mandatory QA Test"
+      },
+      {
+        "code": "IS 4031 (Part 3)",
+        "title": "Determination of soundness (Le Chatelier & Autoclave methods)",
+        "requirement_type": "Mandatory Acceptance Test"
+      },
+      {
+        "code": "IS 4031 (Part 4)",
+        "title": "Determination of consistency of standard cement paste",
+        "requirement_type": "Mandatory QA Test"
+      },
+      {
+        "code": "IS 4031 (Part 5)",
+        "title": "Determination of initial and final setting times",
+        "requirement_type": "Mandatory Acceptance Test"
+      },
+      {
+        "code": "IS 4031 (Part 6)",
+        "title": "Determination of compressive strength of hydraulic cement mortar cubes (50 cm²)",
+        "requirement_type": "Mandatory Acceptance Test (3d, 7d, 28d)"
+      },
+      {
+        "code": "IS 4032: 1985",
+        "title": "Methods of chemical analysis of hydraulic cement (Loss on ignition, insoluble residue, MgO, SO3)",
+        "requirement_type": "Mandatory Chemical Analysis"
+      },
+      {
+        "code": "IS 3535",
+        "title": "Methods of sampling hydraulic cements",
+        "requirement_type": "Mandatory Sampling Protocol"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice (Clause 5.1 cement specifications)"
+      },
+      {
+        "code": "IS 4926: 2003",
+        "title": "Ready-mixed concrete — Code of practice"
+      },
+      {
+        "code": "IS 10262: 2019",
+        "title": "Concrete mix proportioning — Guidelines"
+      }
+    ],
+    "feedstock_and_testing_sand": [
+      {
+        "code": "IS 650: 1991",
+        "title": "Standard sand for testing of cement (Ennore Sand Grades I, II, III)"
+      }
+    ]
+  },
+  "IS 1489 (Part 1)": {
+    "primary_standard": "IS 1489 (Part 1): 2015",
+    "title": "Portland Pozzolana Cement (Fly Ash Based)",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 4031 (Part 2)",
+        "title": "Determination of fineness by Blaine's air permeability method (Min 300 m²/kg)",
+        "requirement_type": "Mandatory Acceptance Test"
+      },
+      {
+        "code": "IS 4031 (Part 3)",
+        "title": "Determination of soundness (Le Chatelier ≤ 10mm, Autoclave ≤ 0.8%)",
+        "requirement_type": "Mandatory Acceptance Test"
+      },
+      {
+        "code": "IS 4031 (Part 5)",
+        "title": "Determination of setting times (Initial ≥ 30 min, Final ≤ 600 min)",
+        "requirement_type": "Mandatory Acceptance Test"
+      },
+      {
+        "code": "IS 4031 (Part 6)",
+        "title": "Determination of compressive strength (3d, 7d, 28d)",
+        "requirement_type": "Mandatory Acceptance Test"
+      },
+      {
+        "code": "IS 1727: 1967",
+        "title": "Methods of test for pozzolanic materials (Lime reactivity test)",
+        "requirement_type": "Pozzolanic Reactivity Verification"
+      },
+      {
+        "code": "IS 4032: 1985",
+        "title": "Methods of chemical analysis of hydraulic cement",
+        "requirement_type": "Mandatory Chemical Analysis"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice"
+      },
+      {
+        "code": "IS 10262: 2019",
+        "title": "Concrete mix proportioning — Guidelines"
+      }
+    ],
+    "feedstock_and_testing_sand": [
+      {
+        "code": "IS 3812 (Part 1): 2013",
+        "title": "Pulverized fuel ash for use as pozzolana in cement mortar and concrete"
+      },
+      {
+        "code": "IS 650: 1991",
+        "title": "Standard sand for testing of cement"
+      }
+    ]
+  },
+  "IS 1489 (Part 2)": {
+    "primary_standard": "IS 1489 (Part 2): 2015",
+    "title": "Portland Pozzolana Cement (Calcined Clay Based)",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 4031 (Part 2, 3, 5, 6)",
+        "title": "Physical testing methods for hydraulic cement",
+        "requirement_type": "Mandatory Acceptance Tests"
+      },
+      {
+        "code": "IS 1727: 1967",
+        "title": "Methods of test for pozzolanic materials (Calcined clay reactivity)",
+        "requirement_type": "Pozzolanic Reactivity Test"
+      },
+      {
+        "code": "IS 4032: 1985",
+        "title": "Chemical analysis of hydraulic cement",
+        "requirement_type": "Chemical Compliance"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice"
+      }
+    ],
+    "feedstock_and_testing_sand": [
+      {
+        "code": "IS 1344: 1981",
+        "title": "Calcined clay pozzolana — Specification"
+      }
+    ]
+  },
+  "IS 455": {
+    "primary_standard": "IS 455: 2015",
+    "title": "Portland Slag Cement",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 4031 (Parts 2, 3, 5, 6)",
+        "title": "Methods of physical tests for hydraulic cement",
+        "requirement_type": "Mandatory Acceptance Tests"
+      },
+      {
+        "code": "IS 4032: 1985",
+        "title": "Methods of chemical analysis of hydraulic cement (MgO, SO3, Sulphide Sulphur)",
+        "requirement_type": "Mandatory Chemical Analysis"
+      },
+      {
+        "code": "IS 12423: 1988",
+        "title": "Method for colorimetric analysis of hydraulic cement (Chloride content)",
+        "requirement_type": "Chloride Limit Verification"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice"
+      },
+      {
+        "code": "IS 4651 (Part 4)",
+        "title": "Code of practice for planning and design of ports and harbours (Marine Concrete)"
+      }
+    ],
+    "feedstock_and_testing_sand": [
+      {
+        "code": "IS 12089: 1987",
+        "title": "Granulated slag for manufacture of Portland slag cement"
+      }
+    ]
+  },
+  "IS 383": {
+    "primary_standard": "IS 383: 2016",
+    "title": "Coarse and Fine Aggregate for Concrete",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 2386 (Part 1): 1963",
+        "title": "Particle size and shape (Sieve analysis, Flakiness index, Elongation index)",
+        "requirement_type": "Mandatory Physical Test"
+      },
+      {
+        "code": "IS 2386 (Part 2): 1963",
+        "title": "Estimation of deleterious materials and organic impurities (Clay, silt, dust)",
+        "requirement_type": "Mandatory Impurities Limit Test"
+      },
+      {
+        "code": "IS 2386 (Part 3): 1963",
+        "title": "Specific gravity, density, voids, absorption and bulking",
+        "requirement_type": "Mandatory Physical Properties Test"
+      },
+      {
+        "code": "IS 2386 (Part 4): 1963",
+        "title": "Mechanical properties (Aggregate crushing value, Aggregate impact value, Los Angeles abrasion)",
+        "requirement_type": "Mandatory Strength & Wear Test"
+      },
+      {
+        "code": "IS 2386 (Part 5): 1963",
+        "title": "Soundness test using Sodium Sulphate or Magnesium Sulphate",
+        "requirement_type": "Durability / Weathering Test"
+      },
+      {
+        "code": "IS 2386 (Part 7): 1963",
+        "title": "Alkali aggregate reactivity (Mortar bar method & chemical method)",
+        "requirement_type": "Durability & Chemical Reactivity Test"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice (Clause 5.3 Aggregates)"
+      },
+      {
+        "code": "IS 10262: 2019",
+        "title": "Concrete mix proportioning guidelines (Combined grading curves)"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  },
+  "IS 1786": {
+    "primary_standard": "IS 1786: 2008",
+    "title": "High Strength Deformed Steel Bars and Wires for Concrete Reinforcement",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 1608 (Part 1): 2018",
+        "title": "Metallic materials — Tensile testing (Yield stress 0.2% proof stress, Ultimate tensile strength, % Elongation)",
+        "requirement_type": "Mandatory Mechanical Test"
+      },
+      {
+        "code": "IS 1599: 2019",
+        "title": "Metallic materials — Bend test (180° mandrel bend without fracture)",
+        "requirement_type": "Mandatory Ductility Test"
+      },
+      {
+        "code": "IS 228 (Relevant Parts)",
+        "title": "Methods of chemical analysis of steels (Carbon, Sulphur, Phosphorus, Carbon Equivalent)",
+        "requirement_type": "Mandatory Chemical & Weldability Test"
+      },
+      {
+        "code": "IS 1786 (Clause 8)",
+        "title": "Re-bend test after aging at 100°C for 30 minutes",
+        "requirement_type": "Mandatory Cold-Bending Integrity Test"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice (Clause 5.6 Reinforcement & Clause 26 Detailing)"
+      },
+      {
+        "code": "IS 13920: 2016",
+        "title": "Ductile design and detailing of reinforced concrete structures subjected to seismic forces"
+      },
+      {
+        "code": "SP 34: 1987",
+        "title": "Handbook on concrete reinforcement and detailing"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  },
+  "IS 456": {
+    "primary_standard": "IS 456: 2000",
+    "title": "Plain and Reinforced Concrete — Code of Practice",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 516 (Part 1-5)",
+        "title": "Methods of tests for strength of concrete (Compressive, Flexural, Core drilling)",
+        "requirement_type": "Mandatory Site QA & Acceptance Test"
+      },
+      {
+        "code": "IS 1199 (Part 1-7)",
+        "title": "Fresh concrete — Methods of sampling, testing and analysis (Slump, Compacting factor, Flow)",
+        "requirement_type": "Workability & Sampling Protocol"
+      },
+      {
+        "code": "IS 3025 (Relevant Parts)",
+        "title": "Methods of sampling and test (Physical and Chemical) for water and wastewater",
+        "requirement_type": "Mixing & Curing Water Quality Test"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 1893 (Part 1): 2016",
+        "title": "Criteria for earthquake resistant design of structures"
+      },
+      {
+        "code": "IS 13920: 2016",
+        "title": "Ductile detailing of reinforced concrete structures"
+      },
+      {
+        "code": "IS 875 (Parts 1-5)",
+        "title": "Code of practice for design loads (Dead, Live, Wind, Snow, Special)"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  },
+  "IS 1343": {
+    "primary_standard": "IS 1343: 2012",
+    "title": "Prestressed Concrete — Code of Practice",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 14268: 2017",
+        "title": "Uncoated stress relieved low relaxation seven-ply strand for prestressed concrete — Specification",
+        "requirement_type": "Mandatory Prestressing Tendon Spec"
+      },
+      {
+        "code": "IS 2090: 1983",
+        "title": "High tensile steel bars used in prestressed concrete",
+        "requirement_type": "Tendon Material Test"
+      },
+      {
+        "code": "IS 516",
+        "title": "Methods of tests for strength of concrete",
+        "requirement_type": "Concrete Strength Verification"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice"
+      },
+      {
+        "code": "IRC: 112-2020",
+        "title": "Code of practice for concrete road bridges (Indian Roads Congress)"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  },
+  "IS 4926": {
+    "primary_standard": "IS 4926: 2003",
+    "title": "Ready-Mixed Concrete — Code of Practice",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 1199",
+        "title": "Methods of sampling and analysis of concrete (Batch point slump test)",
+        "requirement_type": "Mandatory Batch Delivery QC"
+      },
+      {
+        "code": "IS 516",
+        "title": "Method of test for strength of concrete (Cube sampling at discharge)",
+        "requirement_type": "Mandatory 28-day Strength QA"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 456: 2000",
+        "title": "Plain and reinforced concrete — Code of practice"
+      },
+      {
+        "code": "IS 9103: 1999",
+        "title": "Concrete admixtures — Specification"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  },
+  "IS 2116": {
+    "primary_standard": "IS 2116: 1980",
+    "title": "Sand for Masonry Mortars",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 2386 (Part 1)",
+        "title": "Particle size and shape for aggregates (Sieve grading for masonry)",
+        "requirement_type": "Grading Analysis"
+      },
+      {
+        "code": "IS 2386 (Part 2)",
+        "title": "Estimation of deleterious materials and organic impurities (Clay & silt limit ≤ 5%)",
+        "requirement_type": "Silt Content QA"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 2250: 1981",
+        "title": "Code of practice for preparation and use of masonry mortars"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  },
+  "IS 1077": {
+    "primary_standard": "IS 1077: 1992",
+    "title": "Common Burnt Clay Building Bricks",
+    "mandatory_test_methods": [
+      {
+        "code": "IS 3495 (Parts 1-4): 2019",
+        "title": "Methods of tests of burnt clay building bricks: Compressive strength, Water absorption, Efflorescence, Dimension tolerance",
+        "requirement_type": "Mandatory Acceptance Tests"
+      }
+    ],
+    "allied_codes_of_practice": [
+      {
+        "code": "IS 2212: 1991",
+        "title": "Code of practice for brickwork"
+      }
+    ],
+    "feedstock_and_testing_sand": []
+  }
+}
