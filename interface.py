@@ -176,10 +176,14 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* Clean top spacing */
-    .block-container {
-        padding-top: 1.2rem !important;
+    /* Clean top spacing & full-width layout */
+    .block-container,
+    [data-testid="stMainBlockContainer"] {
+        padding-top: 0 !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
         padding-bottom: 2rem !important;
+        max-width: 100% !important;
     }
 
     /* 2. Global Typography */
@@ -202,17 +206,21 @@ st.markdown("""
         letter-spacing: 0.2px;
     }
 
-    /* GIGW Accessibility Top Bar */
+    /* GIGW Accessibility Top Bar — Full Viewport Edge-to-Edge */
     .gigw-top-bar {
         background-color: #071e3d;
         color: #cbd5e1;
-        padding: 6px 20px;
-        font-size: 0.8rem;
+        padding: 8px 2rem;
+        font-size: 0.82rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #1e3a8a;
-        margin: -1rem -1rem 0 -1rem;
+        margin-left: -2rem !important;
+        margin-right: -2rem !important;
+        margin-top: 0 !important;
+        width: calc(100% + 4rem) !important;
+        box-sizing: border-box;
         font-family: 'Poppins', sans-serif;
     }
     .gigw-top-left {
@@ -235,12 +243,16 @@ st.markdown("""
         color: #f8fafc;
     }
 
-    /* National Tricolor Accent Stripe */
+    /* National Tricolor Accent Stripe — Full Viewport Edge-to-Edge */
     .tricolor-stripe {
         height: 4px;
         background: linear-gradient(to right, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%);
-        width: 100%;
-        margin: 0 0 16px 0;
+        width: calc(100% + 4rem) !important;
+        margin-left: -2rem !important;
+        margin-right: -2rem !important;
+        margin-top: 0 !important;
+        margin-bottom: 16px !important;
+        box-sizing: border-box;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
@@ -601,14 +613,18 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace !important;
     }
 
-    /* Official Footer */
+    /* Official Footer — Full Viewport Edge-to-Edge */
     .gov-footer {
         background: #071e3d;
         color: #94a3b8;
-        padding: 24px 20px;
+        padding: 28px 2rem;
         border-top: 4px solid #FF9933;
         margin-top: 40px;
-        border-radius: 8px 8px 0 0;
+        margin-left: -2rem !important;
+        margin-right: -2rem !important;
+        margin-bottom: -2rem !important;
+        width: calc(100% + 4rem) !important;
+        box-sizing: border-box;
         font-size: 0.83rem;
         line-height: 1.6;
     }
