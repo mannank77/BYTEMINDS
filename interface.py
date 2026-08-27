@@ -153,6 +153,35 @@ st.markdown("""
         direction: ltr !important;
     }
 
+    /* 0. Completely Hide Streamlit Default Header, Toolbar (Share, Star, Edit, GitHub), Menu & Footer */
+    #MainMenu,
+    header,
+    header[data-testid="stHeader"],
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"],
+    .stAppDeployButton,
+    .stActionButton,
+    [data-testid="stActionButtonIcon"],
+    [data-testid="stToolbarActions"],
+    div[data-testid="stToolbarActions"],
+    div[data-testid="stStatusWidget"],
+    footer {
+        visibility: hidden !important;
+        display: none !important;
+        height: 0 !important;
+        width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Clean top spacing */
+    .block-container {
+        padding-top: 1.2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
     /* 2. Global Typography */
     .stApp, .stMarkdown, .stText, p, label, input, textarea, select {
         font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -601,7 +630,7 @@ st.markdown("""
 st.markdown("""
 <div class="gigw-top-bar">
     <div class="gigw-top-left">
-        <span>🇮🇳 <strong>Government of India</strong></span>
+        <span><strong>Government of India</strong></span>
         <span>•</span>
         <span>Ministry of Consumer Affairs, Food & Public Distribution</span>
     </div>
@@ -635,7 +664,6 @@ T = TRANSLATIONS.get(selected_lang, TRANSLATIONS["English"])
 st.markdown(f"""
 <div class="gov-masthead">
     <div class="gov-masthead-left">
-        <div class="gov-emblem-box">🏛️</div>
         <div>
             <div class="gov-title-en">{T['portal_title']}</div>
             <div class="gov-subtitle">{T['portal_sub']}</div>
@@ -1365,7 +1393,7 @@ st.markdown("""
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
         <div style="max-width: 450px;">
             <div style="font-weight: 800; font-size: 1rem; color: #f8fafc; margin-bottom: 6px;">
-                🏛️ Bureau of Indian Standards (BIS) — Govt. of India
+                Bureau of Indian Standards (BIS) — Govt. of India
             </div>
             <div>Manak Bhavan, 9 Bahadur Shah Zafar Marg, New Delhi 110002. Portal engineered for standard compliance, public procurement transparency, and quality assurance.</div>
         </div>
