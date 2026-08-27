@@ -176,6 +176,22 @@ st.markdown("""
         margin: 0 !important;
     }
 
+    /* 1. Explicit Pure White Light Mode Root Containers */
+    body,
+    .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMainBlockContainer"],
+    .main,
+    .main .block-container {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+
+    [data-testid="stSidebar"] {
+        background-color: #f8fafc !important;
+        border-right: 1px solid #e2e8f0 !important;
+    }
+
     /* Clean top spacing & full-width layout */
     .block-container,
     [data-testid="stMainBlockContainer"] {
@@ -186,10 +202,10 @@ st.markdown("""
         max-width: 100% !important;
     }
 
-    /* 2. Global Typography */
-    .stApp, .stMarkdown, .stText, p, label, input, textarea, select {
+    /* 2. Global Typography in Light Mode */
+    .stApp, .stMarkdown, .stText, p, label, span, div {
         font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: #1e293b;
+        color: #0f172a;
     }
     
     /* Headings with Montserrat */
@@ -197,6 +213,7 @@ st.markdown("""
         font-family: 'Montserrat', 'Poppins', 'Noto Sans Devanagari', sans-serif !important;
         letter-spacing: -0.3px;
         font-weight: 700 !important;
+        color: #071e3d !important;
     }
 
     /* Buttons, Action Badges & Tabs */
@@ -204,6 +221,78 @@ st.markdown("""
         font-family: 'Montserrat', 'Poppins', sans-serif !important;
         font-weight: 600 !important;
         letter-spacing: 0.2px;
+    }
+
+    /* Tab Headers in Light Mode */
+    div[data-baseweb="tab-list"] {
+        background-color: transparent !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+    }
+    div[data-baseweb="tab-list"] button {
+        color: #475569 !important;
+        font-family: 'Montserrat', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        background-color: transparent !important;
+    }
+    div[data-baseweb="tab-list"] button[aria-selected="true"] {
+        color: #071e3d !important;
+        border-bottom: 3px solid #071e3d !important;
+        font-weight: 700 !important;
+    }
+    div[data-baseweb="tab-list"] button p {
+        color: inherit !important;
+    }
+
+    /* Form Fields, Inputs & Text Areas in Light Mode */
+    div[data-baseweb="input"],
+    div[data-baseweb="textarea"],
+    .stTextArea textarea,
+    .stTextInput input,
+    input, textarea {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .stTextArea textarea:focus,
+    .stTextInput input:focus {
+        border-color: #071e3d !important;
+        box-shadow: 0 0 0 2px rgba(7,30,61,0.15) !important;
+    }
+    .stTextArea textarea::placeholder,
+    .stTextInput input::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    /* Primary Submit Button in Light Mode */
+    div[data-testid="stForm"] .stButton > button[kind="primary"],
+    .stButton > button[kind="primary"] {
+        background-color: #071e3d !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 6px !important;
+        font-weight: 700 !important;
+    }
+    div[data-testid="stForm"] .stButton > button[kind="primary"]:hover,
+    .stButton > button[kind="primary"]:hover {
+        background-color: #1e3a8a !important;
+        color: #ffffff !important;
+    }
+    div[data-testid="stForm"] .stButton > button[kind="primary"] p,
+    .stButton > button[kind="primary"] p {
+        color: #ffffff !important;
+    }
+
+    /* Secondary Clear Button */
+    div[data-testid="stForm"] .stButton > button[kind="secondary"] {
+        background-color: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    div[data-testid="stForm"] .stButton > button[kind="secondary"] p {
+        color: #334155 !important;
     }
 
     /* GIGW Accessibility Top Bar — Full Viewport Edge-to-Edge */
@@ -375,24 +464,32 @@ st.markdown("""
         border-bottom: 1px solid #e2e8f0;
     }
     [data-testid="stSidebar"] .stButton > button {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: #0f172a;
-        border-radius: 6px;
-        padding: 8px 12px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        text-align: left;
-        transition: all 0.15s ease;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        width: 100%;
-        margin-bottom: 4px;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        text-align: left !important;
+        transition: all 0.15s ease !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+        width: 100% !important;
+        margin-bottom: 4px !important;
+    }
+    [data-testid="stSidebar"] .stButton > button p,
+    [data-testid="stSidebar"] .stButton > button span {
+        color: #0f172a !important;
     }
     [data-testid="stSidebar"] .stButton > button:hover {
-        background: #f1f5f9;
-        border-color: #071e3d;
-        color: #071e3d;
-        transform: translateY(-1px);
+        background-color: #f1f5f9 !important;
+        border-color: #071e3d !important;
+        color: #071e3d !important;
+        transform: translateY(-1px) !important;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover p,
+    [data-testid="stSidebar"] .stButton > button:hover span {
+        color: #071e3d !important;
     }
 
     /* Search Box & Controls */
@@ -662,7 +759,7 @@ st.markdown("""
 # Language & Accessibility Toolbar (100% visible, no clipping)
 c_bar1, c_bar2, c_bar3 = st.columns([3.2, 1.2, 1.0])
 with c_bar1:
-    st.caption("🌐 **Accessibility, Language & Display Theme / अभिगम्यता एवं भाषा:**")
+    st.markdown('<div style="font-size: 0.84rem; font-weight: 600; padding-top: 6px; color: inherit;">🌐 Accessibility, Language & Display Theme / अभिगम्यता एवं भाषा:</div>', unsafe_allow_html=True)
 with c_bar2:
     selected_lang = st.selectbox(
         "Language",
