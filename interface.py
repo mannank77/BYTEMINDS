@@ -659,10 +659,10 @@ st.markdown("""
 <div class="tricolor-stripe"></div>
 """, unsafe_allow_html=True)
 
-# Language Selector Bar (100% visible, no clipping)
-c_bar1, c_bar2 = st.columns([4, 1.2])
+# Language & Accessibility Toolbar (100% visible, no clipping)
+c_bar1, c_bar2, c_bar3 = st.columns([3.2, 1.2, 1.0])
 with c_bar1:
-    st.caption("🌐 **Official Language Switcher / भाषा चयन:** Switch portal display language instantly with 1-click:")
+    st.caption("🌐 **Accessibility, Language & Display Theme / अभिगम्यता एवं भाषा:**")
 with c_bar2:
     selected_lang = st.selectbox(
         "Language",
@@ -671,8 +671,164 @@ with c_bar2:
         label_visibility="collapsed",
         key="portal_lang"
     )
+with c_bar3:
+    dark_mode = st.toggle("🌙 Dark Mode", value=False, key="dark_theme")
 
 T = TRANSLATIONS.get(selected_lang, TRANSLATIONS["English"])
+
+# ── Dynamic High-Contrast Dark Mode Injection ──────────────────────────────────
+if dark_mode:
+    st.markdown("""
+    <style>
+    /* Dark Mode Root & Backgrounds */
+    .stApp, body, [data-testid="stAppViewContainer"] {
+        background-color: #0b1120 !important;
+        color: #f1f5f9 !important;
+    }
+    .stApp, .stMarkdown, .stText, p, label, span, div {
+        color: #f1f5f9;
+    }
+    /* Headings */
+    h1, h2, h3, h4, h5, h6, .gov-title-en, .std-code-title {
+        color: #ffffff !important;
+    }
+    .gov-subtitle {
+        color: #94a3b8 !important;
+    }
+    .gov-masthead {
+        border-bottom-color: #334155 !important;
+    }
+    .gov-status-tag {
+        background: #064e3b !important;
+        border-color: #059669 !important;
+        color: #6ee7b7 !important;
+    }
+    /* Gazette Ticker Dark */
+    .gazette-ticker {
+        background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%) !important;
+        border-color: #b45309 !important;
+        border-left: 5px solid #f59e0b !important;
+        color: #fde68a !important;
+    }
+    /* Sidebar Dark */
+    [data-testid="stSidebar"] {
+        background-color: #0f172a !important;
+        border-right-color: #334155 !important;
+    }
+    .sidebar-header-box {
+        border-bottom-color: #334155 !important;
+    }
+    .sidebar-header-title {
+        color: #ffffff !important;
+    }
+    .sidebar-header-sub {
+        color: #94a3b8 !important;
+    }
+    .sidebar-section-title {
+        color: #60a5fa !important;
+        border-bottom-color: #334155 !important;
+    }
+    [data-testid="stSidebar"] .stButton > button {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background: #334155 !important;
+        border-color: #60a5fa !important;
+        color: #ffffff !important;
+    }
+    /* Cards & Result Panels Dark */
+    .gov-metric-card {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+        border-top: 3px solid #60a5fa !important;
+    }
+    .gov-metric-val {
+        color: #f8fafc !important;
+    }
+    .gov-metric-lbl {
+        color: #94a3b8 !important;
+    }
+    .gov-result-card {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+        border-top: 4px solid #3b82f6 !important;
+    }
+    .gov-result-card-superseded {
+        background: #1e293b !important;
+        border-color: #78350f !important;
+        border-top: 4px solid #f59e0b !important;
+    }
+    .std-code-title {
+        color: #60a5fa !important;
+    }
+    .rank-tag {
+        background: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+    .score-chip {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        color: #cbd5e1 !important;
+    }
+    .search-panel {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    .search-label {
+        color: #ffffff !important;
+    }
+    /* Parameter Table Dark */
+    .param-table th {
+        background: #0f172a !important;
+        color: #60a5fa !important;
+        border-color: #334155 !important;
+    }
+    .param-table td {
+        border-color: #334155 !important;
+        color: #e2e8f0 !important;
+    }
+    .param-table tr:nth-child(even) {
+        background: #172033 !important;
+    }
+    /* Tags & Stamps Dark */
+    .test-pill {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        border-left-color: #60a5fa !important;
+        color: #f1f5f9 !important;
+    }
+    .tender-stamp {
+        background: #0f172a !important;
+        border-color: #60a5fa !important;
+        color: #cbd5e1 !important;
+    }
+    /* Text Inputs & Form Fields Dark */
+    .stTextArea textarea, .stTextInput input, div[data-baseweb="input"] input {
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+        border-color: #475569 !important;
+    }
+    /* Form Buttons Dark */
+    div[data-testid="stForm"] .stButton > button {
+        border-color: #475569 !important;
+    }
+    /* Tab Headers Dark */
+    div[data-baseweb="tab-list"] button {
+        color: #94a3b8 !important;
+    }
+    div[data-baseweb="tab-list"] button[aria-selected="true"] {
+        color: #60a5fa !important;
+        border-bottom-color: #60a5fa !important;
+    }
+    /* Footer Dark */
+    .gov-footer {
+        background: #020617 !important;
+        border-top-color: #FF9933 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 🏛️ 2. Bureau Masthead
