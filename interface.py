@@ -15,6 +15,7 @@ from src.pipeline import run_enriched_pipeline, get_query_validation
 from src.currency_manager import get_currency_manager
 from src.scope_comparator import get_scope_comparator
 from src.compliance_checker import get_compliance_checker
+from src.document_analyzer import get_document_analyzer
 
 # Page Configuration
 st.set_page_config(
@@ -80,7 +81,12 @@ TRANSLATIONS = {
         "badge_active": "ACTIVE",
         "badge_superseded": "SUPERSEDED BY",
         "badge_qco": "MANDATORY QCO (ISI MARK)",
-        "badge_voluntary": "VOLUNTARY / STANDARD"
+        "badge_voluntary": "VOLUNTARY / STANDARD",
+        "tab_upload": "📄 Document Upload & Compliance Audit",
+        "upload_title": "Upload Tender Document for Automated BIS Compliance Audit",
+        "upload_desc": "Upload a tender specification, procurement document, or technical schedule (PDF, DOCX, TXT) and the AI engine will automatically detect IS code references, flag outdated standards, identify missing normative test methods, and recommend additional standards.",
+        "upload_btn": "Upload tender document (.pdf, .docx, .txt)",
+        "upload_analyzing": "Analyzing document — extracting IS codes, checking currency, running compliance audit..."
     },
     "हिन्दी (Hindi)": {
         "portal_title": "भारतीय मानक ब्यूरो (BIS) — मानक एवं विनियामक अनुपालन प्रणाली",
@@ -112,7 +118,12 @@ TRANSLATIONS = {
         "badge_active": "सक्रिय",
         "badge_superseded": "द्वारा प्रतिस्थापित",
         "badge_qco": "अनिवार्य QCO (ISI मार्क)",
-        "badge_voluntary": "स्वैच्छिक / मानक"
+        "badge_voluntary": "स्वैच्छिक / मानक",
+        "tab_upload": "📄 दस्तावेज़ अपलोड एवं अनुपालन लेखापरीक्षा",
+        "upload_title": "निविदा दस्तावेज़ अपलोड करें — स्वचालित BIS अनुपालन लेखापरीक्षा",
+        "upload_desc": "निविदा विनिर्देश, प्रापण दस्तावेज़, या तकनीकी अनुसूची (PDF, DOCX, TXT) अपलोड करें। AI इंजन स्वचालित रूप से IS कोड संदर्भ, पुराने मानक, लापता परीक्षण विधियाँ पहचानेगा और अतिरिक्त मानकों की सिफारिश करेगा।",
+        "upload_btn": "निविदा दस्तावेज़ अपलोड करें (.pdf, .docx, .txt)",
+        "upload_analyzing": "दस्तावेज़ विश्लेषण — IS कोड निकालना, मुद्रा जांच, अनुपालन लेखापरीक्षा चल रही है..."
     }
 }
 
@@ -697,9 +708,10 @@ with st.sidebar:
 # ─────────────────────────────────────────────────────────────────────────────
 # 📑 Main Navigation Tabs
 # ─────────────────────────────────────────────────────────────────────────────
-tab_search, tab_compare, tab_registry = st.tabs([
+tab_search, tab_compare, tab_upload, tab_registry = st.tabs([
     T["tab_search"],
     T["tab_compare"],
+    T["tab_upload"],
     T["tab_registry"]
 ])
 
@@ -1094,6 +1106,255 @@ with tab_registry:
                     st.markdown("- **Gazette Amendments:**")
                     for a in amds:
                         st.markdown(f"  - Amendment #{a['amendment_no']} ({a['year']}): {a['summary']}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ── TAB 3: Document Upload & Compliance Audit
+# ─────────────────────────────────────────────────────────────────────────────
+with tab_upload:
+    st.markdown(f"### 📄 {T['upload_title']}")
+    st.markdown(f"{T['upload_desc']}")
+
+    uploaded_file = st.file_uploader(
+        T["upload_btn"],
+        type=["pdf", "docx", "txt"],
+        help="Supported formats: PDF (tender documents), DOCX (Word specifications), TXT (plain text schedules)",
+        key="doc_upload"
+    )
+
+    if uploaded_file:
+        with st.spinner(T["upload_analyzing"]):
+            analyzer = get_document_analyzer()
+            try:
+                report = analyzer.analyze_document(uploaded_file, uploaded_file.name)
+            except Exception as e:
+                st.error(f"❌ Document processing failed: {e}")
+                st.info("💡 Please ensure the file is a valid PDF, DOCX, or TXT document and is not password-protected.")
+                report = None
+
+        if report:
+            # ── Document Overview Metrics ──
+            st.markdown(f"""
+            <div class="metric-grid">
+                <div class="gov-metric-card">
+                    <div class="gov-metric-val">{report.total_pages}</div>
+                    <div class="gov-metric-lbl">Pages / Sections</div>
+                </div>
+                <div class="gov-metric-card">
+                    <div class="gov-metric-val">{report.total_words:,}</div>
+                    <div class="gov-metric-lbl">Words Analyzed</div>
+                </div>
+                <div class="gov-metric-card">
+                    <div class="gov-metric-val">{len(report.detected_is_codes)}</div>
+                    <div class="gov-metric-lbl">IS Codes Detected</div>
+                </div>
+                <div class="gov-metric-card">
+                    <div class="gov-metric-val">{report.extraction_time:.2f}s</div>
+                    <div class="gov-metric-lbl">Analysis Latency</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # ── Compliance Gap Summary ──
+            if report.compliance_gaps:
+                for gap in report.compliance_gaps:
+                    sev = gap.get("severity", "INFO")
+                    if sev == "CRITICAL":
+                        st.markdown(f"""
+                        <div class="statutory-callout">
+                            <strong>🚨 CRITICAL COMPLIANCE GAP:</strong> {gap['message']}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    elif sev == "HIGH":
+                        st.markdown(f"""
+                        <div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 5px solid #d97706; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #92400e; margin-bottom: 12px;">
+                            ⚠️ <strong>HIGH PRIORITY:</strong> {gap['message']}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.info(f"ℹ️ {gap['message']}")
+
+            # ── Sub-tabs for detailed analysis ──
+            doc_tab1, doc_tab2, doc_tab3, doc_tab4 = st.tabs([
+                f"🔍 Detected IS Codes ({len(report.detected_is_codes)})",
+                f"⚠️ Outdated & Superseded ({len(report.outdated_codes)})",
+                f"🔬 Missing Normative References ({len(report.missing_normative)})",
+                f"🤖 AI Recommendations ({len(report.recommended_standards)})"
+            ])
+
+            # ── Doc Sub-Tab 1: Detected IS Codes ──
+            with doc_tab1:
+                if report.detected_is_codes:
+                    st.markdown("##### All Indian Standard References Found in Document")
+                    for idx, code in enumerate(report.detected_is_codes, 1):
+                        if code.is_current:
+                            badge_html = f'<span class="badge-active-gov">🟢 {T["badge_active"]}: {code.current_version}</span>'
+                            card_class = "gov-result-card"
+                        else:
+                            badge_html = f'<span class="badge-superseded-gov">⚠️ {T["badge_superseded"]} {code.current_version}</span>'
+                            card_class = "gov-result-card-superseded"
+
+                        year_display = f": {code.year}" if code.year else ""
+
+                        st.markdown(f"""
+                        <div class="{card_class}" style="padding: 12px 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <span class="rank-tag">#{idx}</span>
+                                    <span class="std-code-title">{code.standard_id}{year_display}</span>
+                                    {badge_html}
+                                </div>
+                                <div class="score-chip">
+                                    Status: <strong>{code.currency_status}</strong>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #475569; margin-top: 6px; font-style: italic; border-left: 3px solid #cbd5e1; padding-left: 10px;">
+                                "...{code.line_context}..."
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.info("ℹ️ No IS code references were detected in this document.")
+
+            # ── Doc Sub-Tab 2: Outdated Standards ──
+            with doc_tab2:
+                if report.outdated_codes:
+                    st.markdown("##### ⚠️ Standards Referenced That Are Superseded or Outdated")
+                    st.markdown("""<div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 5px solid #d97706; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #92400e; margin-bottom: 16px;">
+                        <strong>Tender Quality Alert:</strong> The following standards referenced in your document have been superseded. Using outdated standards in tender specifications may lead to procurement disputes, contract ambiguity, or non-compliant supply.
+                    </div>""", unsafe_allow_html=True)
+
+                    for code in report.outdated_codes:
+                        year_display = f": {code.year}" if code.year else ""
+                        st.markdown(f"""
+                        <div class="gov-result-card-superseded" style="padding: 12px 16px;">
+                            <div>
+                                <span class="std-code-title" style="color: #92400e;">{code.standard_id}{year_display}</span>
+                                <span style="font-size: 1.1rem; margin: 0 8px;">→</span>
+                                <span class="std-code-title" style="color: #065f46;">{code.current_version}</span>
+                                <span class="badge-active-gov">✅ USE THIS</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #92400e; margin-top: 6px;">
+                                {code.warning}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 5px solid #16a34a; padding: 12px 16px; border-radius: 6px; color: #14532d; font-size: 0.92rem;">
+                        ✅ <strong>All Clear:</strong> All IS codes referenced in this document appear to be current and active versions. No superseded standards detected.
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # ── Doc Sub-Tab 3: Missing Normative References ──
+            with doc_tab3:
+                if report.missing_normative:
+                    st.markdown("##### 🔬 Mandatory Test Methods & Normative References NOT Found in Document")
+                    st.markdown("""<div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 5px solid #dc2626; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #7f1d1d; margin-bottom: 16px;">
+                        <strong>Specification Completeness Alert:</strong> The following mandatory test methods and normative references are required by the standards in your document but are not mentioned. Omitting these may result in incomplete QA verification and contractual disputes.
+                    </div>""", unsafe_allow_html=True)
+
+                    for nm in report.missing_normative:
+                        st.markdown(f"""
+                        <div class="test-pill" style="border-left-color: #dc2626; margin-bottom: 8px; padding: 10px 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <div>
+                                    <strong style="color: #dc2626;">❌ MISSING:</strong>
+                                    <strong>{nm['missing_code']}</strong>: {nm['missing_title']}
+                                </div>
+                                <div style="font-size: 0.78rem; color: #64748b;">
+                                    Required by: <strong>{nm['parent_standard']}</strong> | Type: {nm['type']}
+                                </div>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 5px solid #16a34a; padding: 12px 16px; border-radius: 6px; color: #14532d; font-size: 0.92rem;">
+                        ✅ <strong>Normative Check Passed:</strong> No critical missing normative references detected, or the document does not reference standards with tracked normative dependencies.
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # ── Doc Sub-Tab 4: AI Recommendations ──
+            with doc_tab4:
+                if report.recommended_standards:
+                    st.markdown("##### 🤖 AI-Recommended Standards Based on Product Descriptions in Document")
+                    st.markdown("The AI engine extracted product descriptions from your document and identified additional relevant standards that should be considered:")
+
+                    for rec in report.recommended_standards:
+                        st.markdown(f"""
+                        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-left: 4px solid #4f46e5; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #312e81; margin: 10px 0;">
+                            🔍 <strong>Extracted Query:</strong> "{rec['query']}"
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                        for r in rec.get("recommendations", []):
+                            mandatory_badge = '<span class="badge-qco-gov">🛑 MANDATORY QCO</span>' if r.get("is_mandatory") else ""
+                            st.markdown(f"""
+                            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 3px solid #071e3d; padding: 10px 14px; border-radius: 4px; margin: 6px 0 6px 20px;">
+                                <span class="std-code-title" style="font-size: 1.05rem;">{r['standard']}</span>
+                                {mandatory_badge}
+                                <span class="score-chip" style="margin-left: 8px;">Score: {r['score']}</span>
+                                <div style="font-size: 0.88rem; color: #475569; margin-top: 4px;">{r['title']}</div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                elif report.detected_products:
+                    st.info("ℹ️ Product descriptions were detected but no additional standard recommendations were generated. The referenced standards may already cover the scope.")
+                else:
+                    st.info("ℹ️ No product descriptions could be extracted from this document for AI analysis. Try uploading a document with explicit material or product specifications.")
+
+            # ── Download Analysis Report ──
+            st.markdown("---")
+            st.markdown("##### 📥 Download Compliance Audit Report")
+
+            report_lines = []
+            report_lines.append(f"BIS COMPLIANCE AUDIT REPORT")
+            report_lines.append(f"=" * 60)
+            report_lines.append(f"Document: {report.filename}")
+            report_lines.append(f"Pages: {report.total_pages} | Words: {report.total_words:,} | Analysis Time: {report.extraction_time:.2f}s")
+            report_lines.append(f"")
+            report_lines.append(f"IS CODES DETECTED: {len(report.detected_is_codes)}")
+            report_lines.append(f"-" * 40)
+            for c in report.detected_is_codes:
+                status_mark = "✅ CURRENT" if c.is_current else f"⚠️ SUPERSEDED → {c.current_version}"
+                report_lines.append(f"  {c.standard_id}{':' + c.year if c.year else ''} — {status_mark}")
+            report_lines.append(f"")
+            report_lines.append(f"OUTDATED STANDARDS: {len(report.outdated_codes)}")
+            report_lines.append(f"-" * 40)
+            for c in report.outdated_codes:
+                report_lines.append(f"  {c.standard_id}{':' + c.year if c.year else ''} → Replace with {c.current_version}")
+                report_lines.append(f"    Reason: {c.warning}")
+            report_lines.append(f"")
+            report_lines.append(f"MISSING NORMATIVE REFERENCES: {len(report.missing_normative)}")
+            report_lines.append(f"-" * 40)
+            for nm in report.missing_normative:
+                report_lines.append(f"  ❌ {nm['missing_code']}: {nm['missing_title']}")
+                report_lines.append(f"     Required by: {nm['parent_standard']} | Type: {nm['type']}")
+            report_lines.append(f"")
+            report_lines.append(f"COMPLIANCE GAPS: {len(report.compliance_gaps)}")
+            report_lines.append(f"-" * 40)
+            for gap in report.compliance_gaps:
+                report_lines.append(f"  [{gap['severity']}] {gap['message']}")
+            report_lines.append(f"")
+            report_lines.append(f"AI RECOMMENDATIONS: {len(report.recommended_standards)}")
+            report_lines.append(f"-" * 40)
+            for rec in report.recommended_standards:
+                report_lines.append(f"  Query: \"{rec['query']}\"")
+                for r in rec.get("recommendations", []):
+                    report_lines.append(f"    → {r['standard']}: {r['title']} (Score: {r['score']})")
+            report_lines.append(f"")
+            report_lines.append(f"=" * 60)
+            report_lines.append(f"Generated by BIS Standards & Compliance Engine — Government of India")
+            report_lines.append(f"SHA-256 Audit Stamp: {compute_sha256(chr(10).join(report_lines))}")
+
+            report_text = "\n".join(report_lines)
+            st.download_button(
+                label="📥 Download Full Compliance Audit Report (.txt)",
+                data=report_text,
+                file_name=f"BIS_Compliance_Audit_{report.filename.rsplit('.', 1)[0]}.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
