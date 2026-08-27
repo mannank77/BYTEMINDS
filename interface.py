@@ -1,13 +1,15 @@
 """
 BIS Standards Recommendation & Compliance Engine — Streamlit UI
 Government of India (GoI) & GIGW 3.0 Compliant National Regulatory Intelligence Portal
-Typography: Montserrat (Headings) + Poppins (UI Body) + Noto Sans Devanagari (Indic)
+Includes 1-Click Google Translate Integration for Multilingual Translation
+Typography: Montserrat (Headings) + Poppins (UI Body)
 """
 
 import time
 import json
 import hashlib
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src.retriever import get_retriever
 from src.pipeline import run_enriched_pipeline, get_query_validation
@@ -50,8 +52,8 @@ def compute_sha256(text: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
-    /* Google Fonts: Montserrat (Headings) + Poppins (UI Body) + Noto Sans Devanagari (Indic) */
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    /* Google Fonts: Montserrat (Headings) + Poppins (UI Body) */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@500;700&display=swap');
 
     /* 1. Protect Streamlit Material Symbols / Material Icons from font overrides */
     [data-testid="stIcon"],
@@ -70,9 +72,9 @@ st.markdown("""
         direction: ltr !important;
     }
 
-    /* 2. Global Typography (Targeted to prevent icon breakage) */
+    /* 2. Global Typography */
     .stApp, .stMarkdown, .stText, p, label, input, textarea, select {
-        font-family: 'Poppins', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
         color: #1e293b;
     }
     
@@ -123,6 +125,19 @@ st.markdown("""
         color: #f8fafc;
     }
 
+    /* Google Translate Widget Styling */
+    .translate-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 4px;
+        padding: 2px 8px;
+        color: #ffffff;
+        font-size: 0.76rem;
+    }
+
     /* National Tricolor Accent Stripe */
     .tricolor-stripe {
         height: 4px;
@@ -156,15 +171,8 @@ st.markdown("""
         border-radius: 8px;
         padding: 6px 10px;
     }
-    .gov-title-hi {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #b45309;
-        letter-spacing: -0.2px;
-        font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif !important;
-    }
     .gov-title-en {
-        font-size: 1.5rem;
+        font-size: 1.55rem;
         font-weight: 800;
         color: #071e3d;
         letter-spacing: -0.4px;
@@ -508,14 +516,36 @@ st.markdown("""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 🏛️ 1. GIGW Accessibility Header & Masthead
+# 🌐 Google Translate Integration Component
+# ─────────────────────────────────────────────────────────────────────────────
+components.html("""
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 4px 8px; font-family: 'Poppins', sans-serif; font-size: 12px; color: #334155;">
+        <span style="font-weight: 600;">🌐 Select Language (Google Translate):</span>
+        <div id="google_translate_element"></div>
+    </div>
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,bn,te,mr,ta,gu,kn,ml,pa',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+""", height=42)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 🏛️ 1. GIGW Accessibility Header & Masthead (Clean, No Dual Stacking)
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="gigw-top-bar">
     <div class="gigw-top-left">
-        <span>🇮🇳 <strong>भारत सरकार</strong> | Government of India</span>
+        <span>🇮🇳 <strong>Government of India</strong></span>
         <span>•</span>
-        <span>उपभोक्ता मामले, खाद्य एवं सार्वजनिक वितरण मंत्रालय</span>
+        <span>Ministry of Consumer Affairs, Food & Public Distribution</span>
     </div>
     <div class="gigw-top-right">
         <span class="gigw-pill">GIGW 3.0 Compliant</span>
@@ -531,9 +561,8 @@ st.markdown("""
     <div class="gov-masthead-left">
         <div class="gov-emblem-box">🏛️</div>
         <div>
-            <div class="gov-title-hi">भारतीय मानक ब्यूरो (BIS) — राष्ट्रीय मानक अनुशंसा एवं विनियामक अनुपालन प्रणाली</div>
             <div class="gov-title-en">Bureau of Indian Standards (BIS) Standards & Compliance Engine</div>
-            <div class="gov-subtitle">Intelligent Hybrid Retrieval, Normative Dependency Graph, Technical Parameter Extraction, QCO Compliance & GeM/CPWD Tender Clause Generator</div>
+            <div class="gov-subtitle">National Regulatory Intelligence, Mandatory QCO Verification & Automated GeM/CPWD Tender Clause Generator</div>
         </div>
     </div>
     <div>
@@ -572,30 +601,30 @@ with st.sidebar:
     
     top_k = st.slider("Recommendations Count (Top-K)", min_value=3, max_value=8, value=5)
 
-    st.markdown('<div class="sidebar-section-title">📚 Quick Vernacular Queries</div>', unsafe_allow_html=True)
-    st.caption("Click any preset query to test regional & vernacular recognition:")
+    st.markdown('<div class="sidebar-section-title">📚 Quick Technical Queries</div>', unsafe_allow_html=True)
+    st.caption("Click any preset query to test standard retrieval:")
 
     quick_queries = [
-        ("सरिया Fe 500D", "TMT Rebar (IS 1786)", "सरिया 16mm Fe 500D (TMT Rebar)"),
-        ("छत की सीमेंट", "Roof Slab OPC 53 (IS 269)", "छत की सीमेंट (Roof Slab Concrete)"),
-        ("बालू व कंक्रीट रेत", "Fine Aggregates (IS 383)", "बालू और कंक्रीट रेत (Fine Aggregates)"),
-        ("OPC 53 Grade", "High Strength Cement", "Ordinary Portland Cement 53 Grade"),
-        ("Prestressed Girders", "Bridge Concrete (IS 1343)", "Prestressed Concrete Bridge Girders"),
-        ("Ready-Mixed Concrete", "RMC Plant (IS 4926)", "Ready-Mixed Concrete Batching Plant")
+        ("TMT Steel Rebar (Fe 500D)", "IS 1786 High Strength Deformed Bars", "16mm Fe 500D TMT Rebar for RCC construction"),
+        ("Roof Slab Concrete (OPC 53)", "IS 269 Ordinary Portland Cement", "High strength OPC 53 Grade Cement for roof slab casting"),
+        ("Fine Aggregates & M-Sand", "IS 383 Coarse & Fine Aggregates", "Manufactured Sand and fine aggregates for concrete"),
+        ("Fly Ash Blended Cement", "IS 1489 Part 1 PPC", "Portland Pozzolana Cement PPC fly ash based"),
+        ("Prestressed Bridge Concrete", "IS 1343 Prestressed Concrete", "High-tensile prestressed concrete girders"),
+        ("Ready-Mixed Concrete (RMC)", "IS 4926 Ready-Mixed Concrete", "Ready-Mixed Concrete batching plant specifications")
     ]
 
-    for hi_term, en_sub, full_q in quick_queries:
-        if st.button(f"🔍 {hi_term} — {en_sub}", use_container_width=True, key=f"q_{hi_term}"):
+    for title, sub, full_q in quick_queries:
+        if st.button(f"🔍 {title}", help=sub, use_container_width=True, key=f"q_{title}"):
             st.session_state["query_input"] = full_q
             st.rerun()
 
     st.markdown('<div class="sidebar-section-title">🏛️ Verified Engine Protocols</div>', unsafe_allow_html=True)
     st.markdown("""
-    - ⚡ **Hybrid BM25 + Embeddings**
+    - ⚡ **Hybrid BM25 + Dense Embeddings**
     - 🔄 **Consolidated Lifecycle (IS 269:2015)**
     - 🔬 **Normative Tests (IS 4031/32/2386)**
     - 🛑 **Statutory QCOs & Scheme-I ISI**
-    - 🌐 **Indic / Multilingual NLP**
+    - 🌐 **Zero-Shot Multilingual Processing**
     - 🔒 **SHA-256 Cryptographic Stamp**
     """)
 
@@ -617,12 +646,12 @@ with tab_search:
     default_text = st.session_state.get("query_input", "")
 
     with st.form("search_form"):
-        st.markdown('<div class="search-label">📝 Enter Material, Product, or Tender Specification Query (English / Hindi / Hinglish)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="search-label">📝 Enter Material, Product, or Tender Specification Query</div>', unsafe_allow_html=True)
         query = st.text_area(
             "Query Description",
             value=default_text,
             height=85,
-            placeholder="e.g. High-strength OPC 53 grade cement for structural columns | सरिया Fe 500D earthquake resistant rebar | छत की ढलाई के लिए सीमेंट...",
+            placeholder="e.g. High-strength OPC 53 grade cement for structural columns OR Fe 500D earthquake resistant rebar OR fine aggregates for concrete...",
             label_visibility="collapsed"
         )
         col1, col2, col3 = st.columns([3, 1, 1])
@@ -656,7 +685,7 @@ with tab_search:
                 if v_meta.get("is_vernacular", False):
                     st.markdown(f"""
                     <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-left: 4px solid #4f46e5; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; color: #312e81; margin-bottom: 14px;">
-                        🌐 <strong>Vernacular / Indic Terminology Recognized:</strong> Detected regional terms <code>{v_meta.get('detected_vernacular_terms')}</code>. Automatically normalized to standardized Bureau technical lexicon.
+                        🌐 <strong>Multilingual Terminology Recognized:</strong> Detected regional terms <code>{v_meta.get('detected_vernacular_terms')}</code>. Automatically normalized to standardized Bureau technical lexicon.
                     </div>
                     """, unsafe_allow_html=True)
 
