@@ -781,7 +781,7 @@ if dark_mode:
     st.markdown("""
     <style>
     /* Dark Mode Root & Backgrounds */
-    .stApp, body, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"], .main, .main .block-container {
+    .stApp, body, [data-testid="stAppViewContainer"] {
         background-color: #0b1120 !important;
         color: #f1f5f9 !important;
     }
@@ -789,10 +789,10 @@ if dark_mode:
         color: #f1f5f9 !important;
     }
     .stMarkdown p, .stText, label, li {
-        color: #f1f5f9 !important;
+        color: #f1f5f9;
     }
     /* Headings */
-    h1, h2, h3, h4, h5, h6, .gov-title-en, .std-code-title, .section-heading {
+    h1, h2, h3, h4, h5, h6, .gov-title-en, .std-code-title {
         color: #ffffff !important;
     }
     .gov-subtitle {
@@ -800,11 +800,6 @@ if dark_mode:
     }
     .gov-masthead {
         border-bottom-color: #334155 !important;
-    }
-    .gov-emblem-box {
-        background: #1e293b !important;
-        border-color: #334155 !important;
-        color: #f1f5f9 !important;
     }
     .gov-status-tag {
         background: #064e3b !important;
@@ -841,17 +836,9 @@ if dark_mode:
         border-color: #334155 !important;
         color: #f8fafc !important;
     }
-    [data-testid="stSidebar"] .stButton > button p,
-    [data-testid="stSidebar"] .stButton > button span {
-        color: #f8fafc !important;
-    }
     [data-testid="stSidebar"] .stButton > button:hover {
         background: #334155 !important;
         border-color: #60a5fa !important;
-        color: #ffffff !important;
-    }
-    [data-testid="stSidebar"] .stButton > button:hover p,
-    [data-testid="stSidebar"] .stButton > button:hover span {
         color: #ffffff !important;
     }
     /* Cards & Result Panels Dark */
@@ -908,12 +895,6 @@ if dark_mode:
     .param-table tr:nth-child(even) {
         background: #172033 !important;
     }
-    /* Statutory Callout */
-    .statutory-callout {
-        background: #450a0a !important;
-        border-color: #7f1d1d !important;
-        color: #fecaca !important;
-    }
     /* Tags & Stamps Dark */
     .test-pill {
         background: #0f172a !important;
@@ -926,10 +907,6 @@ if dark_mode:
         border-color: #60a5fa !important;
         color: #cbd5e1 !important;
     }
-    .stamp-badge {
-        background: #3b82f6 !important;
-        color: #ffffff !important;
-    }
     /* Text Inputs & Form Fields Dark */
     .stTextArea textarea, .stTextInput input, div[data-baseweb="input"] input {
         background-color: #1e293b !important;
@@ -940,27 +917,11 @@ if dark_mode:
     div[data-testid="stForm"] .stButton > button {
         border-color: #475569 !important;
     }
-    div[data-testid="stForm"] .stButton > button[kind="secondary"] {
-        background-color: #1e293b !important;
-        color: #cbd5e1 !important;
-        border: 1px solid #475569 !important;
-    }
-    div[data-testid="stForm"] .stButton > button[kind="secondary"] p {
-        color: #cbd5e1 !important;
-    }
     /* Tab Headers Dark */
-    div[data-baseweb="tab-list"] button,
-    div[data-baseweb="tab-list"] button p,
-    div[data-baseweb="tab-list"] button span,
-    .stTabs button, .stTabs p, .stTabs span {
+    div[data-baseweb="tab-list"] button {
         color: #94a3b8 !important;
     }
-    div[data-baseweb="tab-list"] button[aria-selected="true"],
-    div[data-baseweb="tab-list"] button[aria-selected="true"] p,
-    div[data-baseweb="tab-list"] button[aria-selected="true"] span,
-    .stTabs button[aria-selected="true"],
-    .stTabs button[aria-selected="true"] p,
-    .stTabs button[aria-selected="true"] span {
+    div[data-baseweb="tab-list"] button[aria-selected="true"] {
         color: #60a5fa !important;
         border-bottom-color: #60a5fa !important;
     }
