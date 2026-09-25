@@ -1,0 +1,73 @@
+{
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "analysis": {
+            "filter": {
+                "bis_synonyms": {
+                    "type": "synonym_graph",
+                    "synonyms": [
+                        "33 grade => ordinary portland cement 33 grade opc",
+                        "fly ash => portland pozzolana cement part 1 fly ash based",
+                        "slag cement => portland slag cement",
+                        "aggregate => coarse fine aggregate natural sources concrete",
+                        "concrete masonry blocks => concrete masonry units hollow solid blocks"
+                    ]
+                },
+                "is_code_filter": {
+                    "type": "word_delimiter_graph",
+                    "split_on_numerics": true,
+                    "preserve_original": true
+                }
+            },
+            "analyzer": {
+                "is_code_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": [
+                        "lowercase",
+                        "is_code_filter"
+                    ]
+                },
+                "query_synonym_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "bis_synonyms"
+                    ]
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "standard": {
+                "type": "text",
+                "analyzer": "is_code_analyzer",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "title": {
+                "type": "text",
+                "analyzer": "standard",
+                "search_analyzer": "query_synonym_analyzer"
+            },
+            "category": {
+                "type": "keyword"
+            },
+            "text": {
+                "type": "text"
+            },
+            "embedding": {
+                "type": "dense_vector",
+                "dims": 384,
+                "index": true,
+                "similarity": "cosine"
+            }
+        }
+    }
+}

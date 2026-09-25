@@ -4,6 +4,7 @@ pypdf
 sentence-transformers
 numpy
 qrcode[pil]
+elasticsearch>=8.14.0,<9.0.0
 
 torch
 torchvision

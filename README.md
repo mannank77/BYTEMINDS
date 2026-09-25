@@ -1,6 +1,8 @@
 # 🏗️ BIS Standards Recommendation & Compliance Engine
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+[![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.14+-005571.svg?logo=elasticsearch)](https://www.elastic.co/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?logo=docker)](https://www.docker.com/)
 [![Framework](https://img.shields.io/badge/Streamlit-App-FF4B4B.svg)](https://streamlit.io/)
 [![Embeddings](https://img.shields.io/badge/Sentence--Transformers-all--MiniLM--L6--v2-orange.svg)](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 [![LLM](https://img.shields.io/badge/Ollama-phi:2.7b-green.svg)](https://ollama.ai/)
@@ -13,7 +15,8 @@
 
 The **BIS Standards Recommendation & Compliance Engine** is a comprehensive AI-powered regulatory search, specification extraction, and compliance intelligence system developed by **Team BYTEMINDS**.
 
-It enables Micro, Small, and Medium Enterprises (MSMEs), structural engineers, contractors, and public procurement officers to instantly retrieve applicable **Bureau of Indian Standards (BIS / IS codes)** in sub-second latency, alongside:
+Powered by a high-performance **Elasticsearch 8.x Hybrid Search Engine** (Lucene BM25 + HNSW Cosine Dense Vectors with in-memory failover), it enables Micro, Small, and Medium Enterprises (MSMEs), structural engineers, contractors, and public procurement officers to instantly retrieve applicable **Bureau of Indian Standards (BIS / IS codes)** in sub-second latency, alongside:
+- ⚡ **Production Hybrid Search:** Elasticsearch 8.x combining Lucene BM25 keyword matching (`is_code_analyzer`, synonym graphs) with 384-dimensional dense vectors.
 - 🔄 **Lifecycle & Currency Tracking** (Detecting superseded historical standards & active amendments).
 - 🧪 **Normative Reference Dependency Graph** (Mandatory testing standards e.g., IS 4031/4032/2386 & allied practice codes).
 - 📊 **Quantitative Technical Parameter Extraction** (Compressive strength curves, setting times, fineness, silt limits).
@@ -21,6 +24,7 @@ It enables Micro, Small, and Medium Enterprises (MSMEs), structural engineers, c
 - 🌐 **Multilingual & Vernacular NLP** (Native processing of Hindi in Devanagari script, Hinglish, and regional construction terms).
 - ⚖️ **Side-by-Side Scope Disambiguation** (Comparative matrices for overlapping standards).
 - 📝 **Tender Specification & Site QA Checklist Generator** (CPWD/PWD contract clauses and inspection checklists).
+- 🛡️ **Dual-Engine High Availability:** Seamlessly operates on Elasticsearch and silently falls back to local in-memory search if Docker ever stops.
 
 ---
 
@@ -133,20 +137,22 @@ It enables Micro, Small, and Medium Enterprises (MSMEs), structural engineers, c
 
 | Component | Technology | Purpose |
 | :--- | :--- | :--- |
+| **Search Engine (Production)** | **Elasticsearch 8.14+ (Docker)** | Enterprise hybrid retrieval uniting Lucene BM25 with HNSW dense vector kNN search |
+| **Containerization** | **Docker & Docker Compose** | Isolated single-node cluster with 1GB JVM heap limit and persistent data volume |
 | **Interactive Dashboard** | **Streamlit** | Multi-tab UI featuring smart search, parameter cards, scope comparator, and registry browser |
 | **Semantic AI & Embeddings** | **Sentence-Transformers (`all-MiniLM-L6-v2`)** | 384-dimensional dense semantic vector encoding for contextual material search |
 | **Deep Learning Engine** | **PyTorch (torch, torchvision)** | Backend neural engine optimized for lightweight CPU inference |
-| **Lexical Engine** | **Custom Okapi BM25** | Term frequency saturation scoring with material keywords and title weighting |
+| **Lexical Engine & Analyzers** | **Lucene BM25 & Custom Analyzers** | Custom `is_code_analyzer` (`word_delimiter_graph`) and `synonym_graph` token filters |
 | **LLM Guardrails** | **Ollama (`phi:2.7b`)** | Zero-latency local LLM query classification and out-of-domain query guardrail |
 | **Multilingual NLP** | **Vernacular Normalizer & Indic Lexicon** | Devanagari and Hinglish tokenization, transliteration, and technical expansion |
-| **Data & Graph Store** | **NumPy (`.npy`) & JSON Structured DB** | High-speed vector caching and relational normative graph stores |
+| **Data & Graph Store** | **Elasticsearch Alias + Structured JSON DB** | Real-time indexed catalog with atomic alias swaps and relational normative graph stores |
 | **Evaluation Suite** | **Custom Benchmark Engine (`eval_script.py`)** | Automated evaluation calculating Hit Rate@3, Hit Rate@5, MRR@5, and Latency |
 
 ---
 
 ## 📊 Evaluation & Benchmark Performance
 
-Tested against the official benchmark evaluation dataset (`public_test_set.json`):
+Tested against the official benchmark evaluation dataset (`public_test_set.json`) on the Elasticsearch 8.x hybrid retriever:
 
 ```
 ========================================
@@ -154,10 +160,11 @@ Tested against the official benchmark evaluation dataset (`public_test_set.json`
 ========================================
 Total Queries Evaluated : 10
 Hit Rate @3             : 100.00% 	(Target: >80%)
-MRR @5                  : 1.0000 	(Target: >0.7)
-Avg Latency             : 0.02 sec 	(Target: <5 seconds)
+MRR @5                  : 0.9500 	(Target: >0.7)
+Avg Latency             : 2.88 sec 	(Target: <5 seconds)
 ========================================
 ```
+*(Subsequent live queries against the active Elasticsearch cluster execute in sub-40 ms!)*
 
 ---
 
@@ -175,7 +182,7 @@ Avg Latency             : 0.02 sec 	(Target: <5 seconds)
 * **Team Name:** BYTEMINDS  
 * **Project:** BIS Standards Recommendation & Compliance Engine  
 * **Core Modules Developed:**
-  1. Hybrid Search Architecture & BM25-Semantic Fusion.
+  1. **Elasticsearch 8.x Hybrid Search Architecture** (Lucene BM25 + HNSW kNN + In-Memory Fallback).
   2. Standards Lifecycle & Currency Tracking Engine.
   3. Normative Reference & Testing Dependency Graph.
   4. Structured Technical Parameter Extraction Engine.
@@ -189,34 +196,49 @@ Avg Latency             : 0.02 sec 	(Target: <5 seconds)
 
 ## 🚀 Quick Start & Usage
 
-### 1. Installation
+### 1. Installation & Container Setup
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd BIS-Standard-RE-master
+git clone https://github.com/mannank77/BYTEMINDS.git
+cd BYTEMINDS
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
+
+# Start Elasticsearch in Docker
+docker compose up -d
+
+# Verify cluster health
+python scripts/es_healthcheck.py
 ```
 
-### 2. Launch the Interactive Web Dashboard
+### 2. (Optional) Ingest or Re-Index Data
+```bash
+# Initial bulk index (indexes 565 standards with vectors)
+python scripts/index_elasticsearch.py
+
+# Zero-downtime atomic re-indexing
+python scripts/reindex.py
+```
+
+### 3. Launch the Interactive Web Dashboard
 ```bash
 streamlit run interface.py
 ```
 
-### 3. Run Automated Capability Verification Suite
-Runs test assertions across all 6 core procedures:
+### 4. Run Automated Capability Verification Suite
+Runs test assertions across all core procedures:
 ```bash
 python test_all_features.py
 ```
 
-### 4. Run Batch Inference & Benchmark Evaluation
+### 5. Run Batch Inference & Benchmark Evaluation
 ```bash
-# Run batch inference
-python inference.py --input public_test_set.json --output results.json
+# Run batch inference with Elasticsearch
+python inference.py --input public_test_set.json --output es_results.json
 
 # Calculate evaluation metrics
-python eval_script.py --results results.json
+python eval_script.py --results es_results.json
 ```
 
 ---
@@ -225,6 +247,17 @@ python eval_script.py --results results.json
 
 ```
 BIS-Standard-RE/
+├── docker-compose.yml           # Elasticsearch 8.14.3 container orchestration
+├── config/
+│   └── es_mapping.json          # Lucene analyzers, synonym graphs & vector mappings
+├── scripts/
+│   ├── index_elasticsearch.py   # Bulk data and vector ingestion pipeline
+│   ├── reindex.py               # Zero-downtime atomic alias swap utility
+│   └── es_healthcheck.py        # Cluster health and document count verification
+├── docs/
+│   ├── ELASTICSEARCH_MIGRATION_PLAN.md # Master 2-person migration plan & WBS
+│   ├── ELASTICSEARCH_SETUP.md          # Docker operations & maintenance guide
+│   └── SEARCH_ENGINE_UPGRADE_ANALYSIS.md # Search engine architectural comparison
 ├── data/
 │   ├── processed_data.json      # Indexed BIS standards documentation
 │   ├── embeddings.npy           # Precomputed semantic vector embeddings
@@ -234,8 +267,8 @@ BIS-Standard-RE/
 │   ├── qco_compliance.json      # Government QCO orders & mandatory ISI database
 │   └── vernacular_lexicon.json  # Hindi & Hinglish vernacular construction terms
 ├── src/
-│   ├── retriever.py             # Hybrid search engine (BM25 + Semantic)
-│   ├── pipeline.py              # Master pipeline orchestrator
+│   ├── retriever.py             # Hybrid Elasticsearch engine + in-memory fallback
+│   ├── pipeline.py              # Master pipeline orchestrator & enriched workflow
 │   ├── currency_manager.py      # Version control & currency manager
 │   ├── normative_tracker.py     # Normative dependency resolver
 │   ├── parameter_extractor.py   # Technical parameter extractor
@@ -244,11 +277,13 @@ BIS-Standard-RE/
 │   ├── scope_comparator.py      # Comparative differentiation engine
 │   ├── tender_generator.py      # Tender specification & QA checklist generator
 │   └── llm_classifier.py        # Local Ollama query guardrail
-├── test_all_features.py         # Automated verification suite (8 tests)
+├── test_all_features.py         # Automated verification suite
 ├── eval_script.py               # Benchmark evaluation script
 ├── inference.py                 # CLI batch inference script
 ├── interface.py                 # Interactive Streamlit Web Application
 ├── public_test_set.json         # Benchmark evaluation dataset
+├── es_results.json              # Latest benchmark test results
 ├── requirements.txt             # Project dependencies
 └── README.md                    # Project documentation
 ```
+
