@@ -3,7 +3,7 @@ ollama
 pypdf
 sentence-transformers
 numpy
-
+qrcode[pil]
 
 torch
 torchvision
