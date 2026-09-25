@@ -31,6 +31,8 @@ from pathlib import Path
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"   # ~90 MB, CPU-friendly
 EMBEDDING_CACHE  = "data/embeddings.npy"                       # precomputed vectors
+LANCEDB_PATH     = "data/lancedb"                              # local LanceDB storage
+LANCEDB_TABLE    = "bis_standards"                             # vector table name
 
 # Fusion weights  (must sum to 1.0)
 BM25_WEIGHT      = 0.40
@@ -132,8 +134,10 @@ class BISRetriever:
 
     def __init__(self, data_path: str | None = None, embedding_cache: str | None = None):
         root = Path(__file__).resolve().parents[1]
+        self.root = root
         self.data_path = Path(data_path) if data_path else root / "data" / "processed_data.json"
         self.cache_path = Path(embedding_cache) if embedding_cache else root / EMBEDDING_CACHE
+        self.lancedb_path = root / LANCEDB_PATH
 
         self.documents: list[dict] = json.loads(
             self.data_path.read_text(encoding="utf-8")
@@ -196,29 +200,53 @@ class BISRetriever:
     # ── Embedding setup ─────────────────────────────────────────────────────────
 
     def _load_embeddings(self) -> None:
-        """Try to load precomputed embeddings + the model for query encoding."""
+        """Try to load LanceDB table or precomputed embeddings + model for query encoding."""
         self.embeddings = None
-        self.embed_model = None
+        self._embed_model_instance = None
+        self.lancedb_table = None
 
+        # 1. Attempt loading LanceDB table first (independent of sentence-transformers)
         try:
-            import numpy as np
-            from sentence_transformers import SentenceTransformer
-        except ImportError:
-            print("[retriever] sentence-transformers not installed -> BM25-only mode")
-            return
-
-        if not self.cache_path.exists():
-            print(f"[retriever] No embedding cache at {self.cache_path} -> building ...")
-            self._build_and_save_embeddings()
-            return
-
-        try:
-            self.embeddings = np.load(str(self.cache_path))
-            self.embed_model = SentenceTransformer(EMBEDDING_MODEL)
-            print(f"[retriever] Loaded {len(self.embeddings)} embeddings -> hybrid mode")
+            import lancedb
+            if self.lancedb_path.exists():
+                db = lancedb.connect(str(self.lancedb_path))
+                try:
+                    tables = db.list_tables()
+                    tbl_names = tables.tables if hasattr(tables, "tables") else list(tables)
+                except Exception:
+                    tbl_names = list(db.table_names())
+                if LANCEDB_TABLE in tbl_names:
+                    self.lancedb_table = db.open_table(LANCEDB_TABLE)
+                    print(f"[retriever] Connected to LanceDB table '{LANCEDB_TABLE}' ({len(self.lancedb_table)} records)")
         except Exception as exc:
-            print(f"[retriever] Could not load embeddings ({exc}) -> BM25-only mode")
-            self.embeddings = None
+            print(f"[retriever] LanceDB table connection skipped ({exc})")
+
+        # 2. Embedding cache fallback
+        if self.cache_path.exists():
+            try:
+                import numpy as np
+                self.embeddings = np.load(str(self.cache_path))
+            except Exception as exc:
+                print(f"[retriever] Could not load embedding cache ({exc})")
+
+        mode = "LanceDB" if self.lancedb_table is not None else ("NumPy cache" if self.embeddings is not None else "BM25-only")
+        print(f"[retriever] Initialized in {mode} mode.")
+
+    @property
+    def embed_model(self):
+        """Lazy-loaded sentence transformer to prevent blocking on startup/network latency."""
+        if not hasattr(self, "_embed_model_instance") or self._embed_model_instance is None:
+            self._embed_model_instance = None
+            try:
+                from sentence_transformers import SentenceTransformer
+                self._embed_model_instance = SentenceTransformer(EMBEDDING_MODEL)
+            except Exception as exc:
+                print(f"[retriever] Semantic embedder unavailable ({exc})")
+        return self._embed_model_instance
+
+    @embed_model.setter
+    def embed_model(self, value):
+        self._embed_model_instance = value
 
     def _build_and_save_embeddings(self) -> None:
         """Encode all documents and save as .npy (call once, ~30 s on CPU)."""
@@ -316,13 +344,31 @@ class BISRetriever:
             bm25_scores.append(score)
 
         # ── Semantic phase (skip if unavailable) ────────────────────────────────
-        if self.embeddings is not None and self.embed_model is not None:
+        if (self.lancedb_table is not None or self.embeddings is not None) and self.embed_model is not None:
             import numpy as np
 
             q_vec = self.embed_model.encode(
                 [expanded], normalize_embeddings=True
             )[0]                                         # shape (dim,)
-            sem_scores = (self.embeddings @ q_vec).tolist()   # cosine sim
+
+            if self.lancedb_table is not None:
+                # Optimized LanceDB search replacing raw NumPy dot product (self.embeddings @ q_vec)
+                lance_hits = (
+                    self.lancedb_table.search(q_vec)
+                    .metric("cosine")
+                    .select(["doc_index", "standard", "_distance"])
+                    .limit(len(self.documents))
+                    .to_list()
+                )
+                # LanceDB cosine distance = 1 - cosine_similarity (for normalized vectors)
+                sem_scores = [0.0] * len(self.documents)
+                for hit in lance_hits:
+                    idx = hit.get("doc_index")
+                    if idx is not None and 0 <= idx < len(self.documents):
+                        sem_scores[idx] = 1.0 - float(hit.get("_distance", 1.0))
+            else:
+                # Fallback: NumPy dot product
+                sem_scores = (self.embeddings @ q_vec).tolist()
 
             # Min-max normalise each score list to [0, 1] before fusing
             def _norm(scores: list[float]) -> list[float]:
@@ -355,6 +401,80 @@ class BISRetriever:
             }
             for i, score in scored[:top_k]
         ]
+
+
+    # ── Real-Time Dynamic Ingestion ──────────────────────────────────────────
+
+    def add_document(
+        self,
+        standard: str,
+        title: str,
+        text: str,
+        category: str = "",
+        vector: list[float] | None = None,
+    ) -> dict:
+        """
+        Dynamically appends a new document embedding into LanceDB and updates the BM25 index in real-time.
+        """
+        import uuid
+        norm_std = normalize_standard(standard)
+        doc_idx = len(self.documents)
+        doc = {
+            "standard": norm_std,
+            "title": title,
+            "category": category,
+            "text": text,
+        }
+        self.documents.append(doc)
+
+        # Update in-memory BM25 index tokens
+        weighted_text = " ".join([
+            (norm_std + " ") * 8,
+            (title + " ") * 12,
+            (category + " ") * 4,
+            text,
+        ])
+        tokens = tokenize(weighted_text)
+        counts = Counter(tokens)
+        self.doc_tokens.append(tokens)
+        self.doc_term_counts.append(counts)
+        self.num_docs = len(self.documents)
+        self.avg_doc_len = sum(len(t) for t in self.doc_tokens) / max(self.num_docs, 1)
+
+        # Generate embedding vector if not provided
+        if vector is None and self.embed_model is not None:
+            embed_text = " ".join(filter(None, [norm_std, title, category, text[:512]]))
+            vec = self.embed_model.encode([embed_text], normalize_embeddings=True)[0].tolist()
+        else:
+            vec = list(vector) if vector is not None else []
+
+        doc_id = str(uuid.uuid4())
+
+        # Real-time append into LanceDB
+        if self.lancedb_table is not None and vec:
+            record = [{
+                "id": doc_id,
+                "doc_index": doc_idx,
+                "standard": norm_std,
+                "title": title,
+                "text": text[:1024],
+                "vector": vec,
+            }]
+            self.lancedb_table.add(record)
+            print(f"[retriever] Appended document '{norm_std}' to LanceDB table '{LANCEDB_TABLE}'.")
+
+        return {"id": doc_id, "doc_index": doc_idx, "standard": norm_std}
+
+    def delete_document(self, doc_id: str) -> bool:
+        """
+        Deletes a document from the LanceDB table by its unique ID.
+        """
+        if self.lancedb_table is not None:
+            # SQL string literals require single quotes in Lance/DataFusion
+            self.lancedb_table.delete(f"id = '{doc_id}'")
+            print(f"[retriever] Deleted document '{doc_id}' from LanceDB table '{LANCEDB_TABLE}'.")
+            return True
+        return False
 
 
 # ── Elasticsearch Retriever ──────────────────────────────────────────────────────
@@ -495,4 +615,4 @@ def get_retriever():
         print("[retriever] Using ElasticsearchRetriever ('bis_standards_active')")
         return es_retriever
     print("[retriever] Using in-memory BISRetriever (fallback mode)")
-    return BISRetriever()
+    return BISRetriever()

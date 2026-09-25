@@ -10,3 +10,5 @@ ppp/
 
 team_results.json
 *.tmp
+
+data/lancedb/
