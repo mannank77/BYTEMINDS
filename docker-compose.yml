@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: bis_elasticsearch
+    environment:
+      - discovery.type=single-node
+      # Disable security/passwords for local development to keep it simple
+      - xpack.security.enabled=false
+      # Cap RAM usage to 1 GB so it doesn't slow down your PC
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      # Saves data on your PC so it is not lost when stopping the container
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      # Expose port 9200 to your host machine
+      - "9200:9200"
+
+volumes:
+  es_data:
+    driver: local

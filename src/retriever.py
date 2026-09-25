@@ -1,26 +1,20 @@
 """
-BIS Standards Retriever — Two-Stage Hybrid Retrieval with Cross-Encoder Reranking
-==================================================================================
-Architecture
-------------
-  Stage 1  (Retrieval — High Recall)
-     BM25 lexical scoring  +  Dense cosine similarity from BGE-M3 embeddings,
-     fused with a weighted sum.  Retrieves a broad pool of candidate documents
-     (default: top 50).
+BIS Standards Retriever — Hybrid BM25 + Semantic Embeddings
+============================================================
+Two retrieval modes depending on what is available at runtime:
 
-  Stage 2  (Reranking — High Precision)
-     A Cross-Encoder model (BGE-Reranker-v2-M3) jointly scores each
-     (query, document) pair for fine-grained relevance.  Returns the final
-     top-K results with dramatically improved precision.
+  Mode A  (hybrid)  — BM25 score  +  cosine similarity from a local
+                       sentence-transformers model, fused with a weighted sum.
+                       Activated automatically when sentence-transformers is
+                       installed and the embedding cache exists.
 
-Graceful Fallbacks
-------------------
-  - If sentence-transformers is missing → BM25-only (no embeddings, no reranker).
-  - If embedding cache is missing → auto-builds it on first launch (~60 s on CPU).
-  - If cross-encoder fails to load → skips Stage 2 and returns Stage 1 results.
+  Mode B  (BM25-only) — identical to the original retriever; used as a
+                         graceful fallback so inference.py always works.
 
-Building the embedding cache (one-time):
+Building the embedding cache (one-time, ~30 s on CPU):
     python -c "from src.retriever import get_retriever; get_retriever()"
+
+Or run preprocess.py with --build-embeddings to do it as part of indexing.
 """
 
 from __future__ import annotations
@@ -35,29 +29,22 @@ from pathlib import Path
 
 # ── Constants ───────────────────────────────────────────────────────────────────
 
-# Stage 1: Dense Bi-Encoder (BGE-M3 — multilingual, 100+ languages incl. Hindi)
-EMBEDDING_MODEL  = "BAAI/bge-m3"
-EMBEDDING_CACHE  = "data/embeddings_bge_m3.npy"
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"   # ~90 MB, CPU-friendly
+EMBEDDING_CACHE  = "data/embeddings.npy"                       # precomputed vectors
 
-# Stage 2: Cross-Encoder Reranker (BGE-Reranker-v2-M3 — multilingual)
-RERANKER_MODEL   = "BAAI/bge-reranker-v2-m3"
-
-# Stage 1 candidate pool size (fed to Stage 2)
-STAGE1_POOL_SIZE = 50
-
-# Fusion weights for Stage 1 (must sum to 1.0)
-BM25_WEIGHT      = 0.35
-SEMANTIC_WEIGHT  = 0.65
+# Fusion weights  (must sum to 1.0)
+BM25_WEIGHT      = 0.40
+SEMANTIC_WEIGHT  = 0.60
 
 # BM25 hyperparameters (tuned for SP-21 chunk lengths)
 BM25_K1 = 1.4
 BM25_B  = 0.70
 
 # Title / standard-id boost (BM25 phase)
-TITLE_BOOST      = 2.8
-MATERIAL_BOOST   = 5.0
+TITLE_BOOST    = 2.8
+MATERIAL_BOOST = 5.0
 MATERIAL_PENALTY = -1.5
-EXPLICIT_BOOST   = 100.0
+EXPLICIT_BOOST = 100.0
 
 STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "both", "by", "for",
@@ -139,13 +126,8 @@ def normalize_standard(standard: str) -> str:
 
 class BISRetriever:
     """
-    Two-stage hybrid retriever:
-      Stage 1 — BM25 + BGE-M3 dense embeddings → top STAGE1_POOL_SIZE candidates
-      Stage 2 — BGE-Reranker-v2-M3 cross-encoder → final top-K with max precision
-
-    Falls back gracefully:
-      - No sentence-transformers → BM25-only
-      - No cross-encoder       → Stage 1 results returned directly
+    Hybrid retriever.  Falls back to BM25-only if sentence-transformers or
+    the embedding cache is not available.
     """
 
     def __init__(self, data_path: str | None = None, embedding_cache: str | None = None):
@@ -158,7 +140,6 @@ class BISRetriever:
         )
         self._prepare_bm25()
         self._load_embeddings()          # no-op if unavailable
-        self._load_reranker()            # no-op if unavailable
 
     # ── BM25 setup ──────────────────────────────────────────────────────────────
 
@@ -212,91 +193,70 @@ class BISRetriever:
         )[0]
         return re.sub(r"\s+", " ", title).strip(" -—:")[:250]
 
-    # ── Embedding setup (Stage 1 — Dense Retrieval) ─────────────────────────────
+    # ── Embedding setup ─────────────────────────────────────────────────────────
 
     def _load_embeddings(self) -> None:
-        """Try to load precomputed BGE-M3 embeddings + the model for query encoding."""
+        """Try to load precomputed embeddings + the model for query encoding."""
         self.embeddings = None
         self.embed_model = None
 
         try:
             import numpy as np
             from sentence_transformers import SentenceTransformer
-            
-            if not self.cache_path.exists():
-                print(f"[retriever] No embedding cache at {self.cache_path} -> building ...")
-                self._build_and_save_embeddings()
-                return
-
-            self.embeddings = np.load(str(self.cache_path))
-            self.embed_model = SentenceTransformer(EMBEDDING_MODEL)
-            print(f"[retriever] Loaded {len(self.embeddings)} BGE-M3 embeddings -> hybrid mode")
         except ImportError:
             print("[retriever] sentence-transformers not installed -> BM25-only mode")
+            return
+
+        if not self.cache_path.exists():
+            print(f"[retriever] No embedding cache at {self.cache_path} -> building ...")
+            self._build_and_save_embeddings()
+            return
+
+        try:
+            self.embeddings = np.load(str(self.cache_path))
+            self.embed_model = SentenceTransformer(EMBEDDING_MODEL)
+            print(f"[retriever] Loaded {len(self.embeddings)} embeddings -> hybrid mode")
         except Exception as exc:
             print(f"[retriever] Could not load embeddings ({exc}) -> BM25-only mode")
             self.embeddings = None
 
     def _build_and_save_embeddings(self) -> None:
-        """Encode all documents with BGE-M3 and save as .npy (one-time, ~60 s on CPU)."""
+        """Encode all documents and save as .npy (call once, ~30 s on CPU)."""
         try:
             import numpy as np
             from sentence_transformers import SentenceTransformer
-            
-            model = SentenceTransformer(EMBEDDING_MODEL)
-
-            # Build a rich sentence per standard for embedding
-            sentences = []
-            for doc in self.documents:
-                sentence = " ".join(filter(None, [
-                    doc.get("standard", ""),
-                    doc.get("title", ""),
-                    doc.get("category", ""),
-                    doc.get("text", "")[:512],     # cap to avoid very long inputs
-                ]))
-                sentences.append(sentence)
-
-            print(f"[retriever] Encoding {len(sentences)} standards with {EMBEDDING_MODEL} ...")
-            vecs = model.encode(sentences, batch_size=32, show_progress_bar=True,
-                                normalize_embeddings=True)
-
-            self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-            np.save(str(self.cache_path), vecs)
-            self.embeddings = vecs
-            self.embed_model = model
-            print(f"[retriever] Saved BGE-M3 embeddings to {self.cache_path}")
         except ImportError:
-            pass
+            return
 
-    # ── Cross-Encoder Reranker setup (Stage 2 — Precision) ──────────────────────
+        model = SentenceTransformer(EMBEDDING_MODEL)
 
-    def _load_reranker(self) -> None:
-        """Load the BGE-Reranker-v2-M3 cross-encoder for Stage 2 reranking."""
-        self.reranker = None
+        # Build a rich sentence per standard for embedding
+        sentences = []
+        for doc in self.documents:
+            sentence = " ".join(filter(None, [
+                doc.get("standard", ""),
+                doc.get("title", ""),
+                doc.get("category", ""),
+                doc.get("text", "")[:512],     # cap to avoid very long inputs
+            ]))
+            sentences.append(sentence)
 
-        try:
-            from sentence_transformers import CrossEncoder
-            self.reranker = CrossEncoder(RERANKER_MODEL)
-            print(f"[retriever] Loaded cross-encoder reranker: {RERANKER_MODEL}")
-        except ImportError:
-            print("[retriever] CrossEncoder not available -> skipping Stage 2 reranking")
-        except Exception as exc:
-            print(f"[retriever] Could not load reranker ({exc}) -> skipping Stage 2")
-            self.reranker = None
+        print(f"[retriever] Encoding {len(sentences)} standards ...")
+        vecs = model.encode(sentences, batch_size=64, show_progress_bar=True,
+                            normalize_embeddings=True)
+
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        np.save(str(self.cache_path), vecs)
+        self.embeddings = vecs
+        self.embed_model = model
+        print(f"[retriever] Saved embeddings to {self.cache_path}")
 
     # ── Query helpers ───────────────────────────────────────────────────────────
 
     def _expanded_query(self, query: str) -> str:
-        # 1. Vernacular / Hindi / Hinglish translation & domain normalization
-        try:
-            from src.vernacular_normalizer import get_vernacular_normalizer
-            v_norm, meta = get_vernacular_normalizer().normalize_query(query)
-        except Exception:
-            v_norm = query
-
-        lowered = v_norm.lower()
+        lowered = query.lower()
         additions = [v for k, v in QUERY_EXPANSIONS.items() if k in lowered]
-        return " ".join([v_norm, *additions])
+        return " ".join([query, *additions])
 
     def _explicit_standard_matches(self, query: str) -> set[int]:
         matches = re.findall(
@@ -333,72 +293,15 @@ class BISRetriever:
             )
         return score
 
-    # ── Stage 2: Cross-Encoder Reranking ─────────────────────────────────────────
-
-    def _rerank(self, query: str, candidates: list[tuple[int, float]], top_k: int) -> list[tuple[int, float]]:
-        """
-        Rerank candidate documents using BGE-Reranker-v2-M3 cross-encoder.
-
-        Args:
-            query: The original user query string.
-            candidates: List of (doc_index, stage1_score) from Stage 1.
-            top_k: Number of final results to return.
-
-        Returns:
-            List of (doc_index, reranker_score) sorted by reranker relevance.
-        """
-        if self.reranker is None or not candidates:
-            return candidates[:top_k]
-
-        # Build (query, document_text) pairs for the cross-encoder
-        pairs = []
-        for doc_idx, _ in candidates:
-            doc = self.documents[doc_idx]
-            # Construct a rich document representation for the reranker
-            doc_text = " ".join(filter(None, [
-                doc.get("standard", ""),
-                doc.get("title", ""),
-                doc.get("category", ""),
-                doc.get("text", "")[:1024],   # cap text length for efficiency
-            ]))
-            pairs.append((query, doc_text))
-
-        try:
-            # CrossEncoder.predict returns a list of relevance scores
-            reranker_scores = self.reranker.predict(pairs, show_progress_bar=False)
-
-            # Pair each candidate doc_index with its reranker score
-            reranked = [
-                (candidates[i][0], float(reranker_scores[i]))
-                for i in range(len(candidates))
-            ]
-
-            # Sort by reranker score (highest = most relevant)
-            reranked.sort(key=lambda x: x[1], reverse=True)
-
-            return reranked[:top_k]
-
-        except Exception as exc:
-            print(f"[retriever] Reranking failed ({exc}) -> returning Stage 1 results")
-            return candidates[:top_k]
-
-    # ── Main retrieve (Two-Stage Pipeline) ───────────────────────────────────────
+    # ── Main retrieve ────────────────────────────────────────────────────────────
 
     def retrieve(self, query: str, top_k: int = 5) -> list[dict]:
-        """
-        Two-stage retrieval pipeline:
-          Stage 1: BM25 + BGE-M3 dense embeddings → top STAGE1_POOL_SIZE candidates
-          Stage 2: BGE-Reranker-v2-M3 cross-encoder → final top_k results
-
-        Returns the same contract as before:
-            [{"standard": str, "title": str, "score": float}, ...]
-        """
         expanded        = self._expanded_query(query)
         query_tokens    = tokenize(expanded)
         query_counts    = Counter(query_tokens)
         explicit_matches = self._explicit_standard_matches(query)
 
-        # ── Stage 1: BM25 phase ─────────────────────────────────────────────────
+        # ── BM25 phase ──────────────────────────────────────────────────────────
         bm25_scores: list[float] = []
         for i, doc in enumerate(self.documents):
             score = self._bm25_score(query_counts, i)
@@ -412,10 +315,7 @@ class BISRetriever:
                 score += EXPLICIT_BOOST
             bm25_scores.append(score)
 
-        # ── Stage 1: Semantic phase (skip if unavailable) ───────────────────────
-        # Determine the pool size: if reranker is available, fetch a larger pool
-        pool_size = STAGE1_POOL_SIZE if self.reranker is not None else top_k
-
+        # ── Semantic phase (skip if unavailable) ────────────────────────────────
         if self.embeddings is not None and self.embed_model is not None:
             import numpy as np
 
@@ -447,24 +347,152 @@ class BISRetriever:
             # BM25-only fallback
             scored = sorted(enumerate(bm25_scores), key=lambda x: x[1], reverse=True)
 
-        # ── Stage 1 candidates (broad pool) ──────────────────────────────────────
-        stage1_candidates = scored[:pool_size]
-
-        # ── Stage 2: Cross-Encoder Reranking (precision) ─────────────────────────
-        final_results = self._rerank(query, stage1_candidates, top_k)
-
         return [
             {
                 "standard": self.documents[i]["standard"],
                 "title":    self.documents[i].get("title", ""),
                 "score":    score,
             }
-            for i, score in final_results
+            for i, score in scored[:top_k]
         ]
+
+
+# ── Elasticsearch Retriever ──────────────────────────────────────────────────────
+
+ES_HOST = "http://localhost:9200"
+ALIAS_NAME = "bis_standards_active"
+
+
+class ElasticsearchRetriever:
+    """
+    Elasticsearch Hybrid Retriever (Lucene BM25 + HNSW Cosine Dense Vectors).
+    Gracefully falls back to in-memory BISRetriever if Elasticsearch is unreachable.
+    """
+
+    def __init__(self, es_host: str = ES_HOST, alias_name: str = ALIAS_NAME):
+        self.es_host = es_host
+        self.alias_name = alias_name
+        self.fallback: BISRetriever | None = None
+        self.embed_model = None
+
+        try:
+            from elasticsearch import Elasticsearch
+            self.es = Elasticsearch(es_host, request_timeout=2.0)
+        except Exception:
+            self.es = None
+
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.embed_model = SentenceTransformer(EMBEDDING_MODEL)
+        except Exception:
+            self.embed_model = None
+
+    def is_available(self) -> bool:
+        if self.es is None:
+            return False
+        try:
+            return bool(self.es.ping()) and bool(self.es.indices.exists_alias(name=self.alias_name))
+        except Exception:
+            return False
+
+    def _fallback_retriever(self) -> BISRetriever:
+        if self.fallback is None:
+            self.fallback = BISRetriever()
+            if self.embed_model is not None and self.fallback.embed_model is None:
+                self.fallback.embed_model = self.embed_model
+        return self.fallback
+
+    def _extract_explicit_standards(self, query: str) -> list[str]:
+        """Extract explicit standard codes (e.g. IS 383, IS 1489 Part 1)."""
+        matches = re.findall(
+            r"\bIS\s*[:\-]?\s*(\d{2,5})(?:\s*\(?\s*Part\s*(\d+)\s*\)?)?",
+            query,
+            flags=re.I,
+        )
+        explicit_codes = []
+        for number, part in matches:
+            if part:
+                explicit_codes.append(f"IS {number} (Part {part})")
+            else:
+                explicit_codes.append(f"IS {number}")
+        return explicit_codes
+
+    def _expanded_query(self, query: str) -> str:
+        lowered = query.lower()
+        additions = [v for k, v in QUERY_EXPANSIONS.items() if k in lowered]
+        return " ".join([query, *additions])
+
+    def retrieve(self, query: str, top_k: int = 5) -> list[dict]:
+        if not self.is_available():
+            return self._fallback_retriever().retrieve(query, top_k=top_k)
+
+        expanded = self._expanded_query(query)
+        explicit_codes = self._extract_explicit_standards(query)
+
+        should_clauses: list[dict] = [
+            {
+                "multi_match": {
+                    "query": expanded,
+                    "fields": ["standard^8.0", "title^4.0", "category^2.0", "text^1.0"],
+                    "boost": BM25_WEIGHT,
+                }
+            }
+        ]
+
+        # Explicit code boost (+100.0)
+        for code in explicit_codes:
+            should_clauses.append({
+                "match_phrase": {
+                    "standard": {
+                        "query": code,
+                        "boost": EXPLICIT_BOOST,
+                    }
+                }
+            })
+
+        body: dict = {
+            "query": {
+                "bool": {
+                    "should": should_clauses
+                }
+            },
+            "size": top_k
+        }
+
+        # Add kNN dense vector clause if SentenceTransformer model is available
+        if self.embed_model is not None:
+            q_vec = self.embed_model.encode([expanded], normalize_embeddings=True)[0].tolist()
+            body["knn"] = {
+                "field": "embedding",
+                "query_vector": q_vec,
+                "k": max(top_k * 3, 10),
+                "num_candidates": 50,
+                "boost": SEMANTIC_WEIGHT,
+            }
+
+        try:
+            res = self.es.search(index=self.alias_name, body=body)
+            hits = res.get("hits", {}).get("hits", [])
+            return [
+                {
+                    "standard": hit["_source"]["standard"],
+                    "title": hit["_source"].get("title", ""),
+                    "score": hit.get("_score", 0.0),
+                }
+                for hit in hits
+            ]
+        except Exception as exc:
+            print(f"[retriever] Elasticsearch query error ({exc}) -> falling back to in-memory")
+            return self._fallback_retriever().retrieve(query, top_k=top_k)
 
 
 # ── Singleton ────────────────────────────────────────────────────────────────────
 
 @lru_cache(maxsize=1)
-def get_retriever() -> BISRetriever:
+def get_retriever():
+    es_retriever = ElasticsearchRetriever()
+    if es_retriever.is_available():
+        print("[retriever] Using ElasticsearchRetriever ('bis_standards_active')")
+        return es_retriever
+    print("[retriever] Using in-memory BISRetriever (fallback mode)")
     return BISRetriever()
