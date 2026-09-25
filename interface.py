@@ -8,7 +8,11 @@ Typography: Montserrat (Headings) + Poppins (UI Body)
 import time
 import json
 import hashlib
+import base64
+import io
+from datetime import datetime, timezone
 import streamlit as st
+import qrcode
 
 from src.retriever import get_retriever
 from src.pipeline import run_enriched_pipeline, get_query_validation
@@ -43,8 +47,28 @@ compliance_chk = engine["compliance_chk"]
 
 
 def compute_sha256(text: str) -> str:
-    """Generate SHA-256 digest for cryptographic provenance stamp."""
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:24].upper()
+    """Generate full-length SHA-256 digest (64 hex chars) for cryptographic provenance."""
+    return hashlib.sha256(text.encode("utf-8")).hexdigest().upper()
+
+
+def compute_timestamped_sha256(text: str) -> tuple:
+    """Generate SHA-256 digest with embedded UTC timestamp for provenance chain.
+    Returns (full_hash, utc_timestamp_str)."""
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    combined = f"{text}|SIGNED_AT|{ts}"
+    digest = hashlib.sha256(combined.encode("utf-8")).hexdigest().upper()
+    return digest, ts
+
+
+def generate_qr_code(data: str) -> str:
+    """Generate a QR code as a base64-encoded PNG for embedding in Streamlit HTML."""
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=6, border=2)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#071e3d", back_color="#f8fafc")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -86,7 +110,16 @@ TRANSLATIONS = {
         "upload_title": "Upload Tender Document for Automated BIS Compliance Audit",
         "upload_desc": "Upload a tender specification, procurement document, or technical schedule (PDF, DOCX, TXT) and the AI engine will automatically detect IS code references, flag outdated standards, identify missing normative test methods, and recommend additional standards.",
         "upload_btn": "Upload tender document (.pdf, .docx, .txt)",
-        "upload_analyzing": "Analyzing document — extracting IS codes, checking currency, running compliance audit..."
+        "upload_analyzing": "Analyzing document — extracting IS codes, checking currency, running compliance audit...",
+        "tab_verify": "🔐 Document Integrity Verifier",
+        "verify_title": "Cryptographic Document Integrity Verification",
+        "verify_desc": "Paste any tender clause, compliance report, or document text below along with its SHA-256 stamp to verify tamper-evidence. Or generate a new stamp for any text.",
+        "verify_input_label": "Paste Document / Tender Text",
+        "verify_hash_label": "Paste SHA-256 Stamp to Verify (optional)",
+        "verify_btn": "🔒 Compute Hash & Verify",
+        "verify_match": "✅ INTEGRITY VERIFIED — Document matches the provided SHA-256 stamp. No tampering detected.",
+        "verify_mismatch": "❌ INTEGRITY FAILURE — Document does NOT match the provided SHA-256 stamp. Possible tampering detected.",
+        "verify_generated": "SHA-256 stamp generated for the provided text."
     },
     "हिन्दी (Hindi)": {
         "portal_title": "भारतीय मानक ब्यूरो (BIS) — मानक एवं विनियामक अनुपालन प्रणाली",
@@ -123,7 +156,16 @@ TRANSLATIONS = {
         "upload_title": "निविदा दस्तावेज़ अपलोड करें — स्वचालित BIS अनुपालन लेखापरीक्षा",
         "upload_desc": "निविदा विनिर्देश, प्रापण दस्तावेज़, या तकनीकी अनुसूची (PDF, DOCX, TXT) अपलोड करें। AI इंजन स्वचालित रूप से IS कोड संदर्भ, पुराने मानक, लापता परीक्षण विधियाँ पहचानेगा और अतिरिक्त मानकों की सिफारिश करेगा।",
         "upload_btn": "निविदा दस्तावेज़ अपलोड करें (.pdf, .docx, .txt)",
-        "upload_analyzing": "दस्तावेज़ विश्लेषण — IS कोड निकालना, मुद्रा जांच, अनुपालन लेखापरीक्षा चल रही है..."
+        "upload_analyzing": "दस्तावेज़ विश्लेषण — IS कोड निकालना, मुद्रा जांच, अनुपालन लेखापरीक्षा चल रही है...",
+        "tab_verify": "🔐 दस्तावेज़ अखंडता सत्यापक",
+        "verify_title": "क्रिप्टोग्राफ़िक दस्तावेज़ अखंडता सत्यापन",
+        "verify_desc": "किसी भी निविदा खंड, अनुपालन रिपोर्ट, या दस्तावेज़ पाठ को नीचे चिपकाएं और उसके SHA-256 स्टैम्प के साथ सत्यापित करें।",
+        "verify_input_label": "दस्तावेज़ / निविदा पाठ चिपकाएं",
+        "verify_hash_label": "सत्यापन के लिए SHA-256 स्टैम्प चिपकाएं (वैकल्पिक)",
+        "verify_btn": "🔒 हैश गणना करें एवं सत्यापित करें",
+        "verify_match": "✅ अखंडता सत्यापित — दस्तावेज़ SHA-256 स्टैम्प से मेल खाता है। कोई छेड़छाड़ नहीं।",
+        "verify_mismatch": "❌ अखंडता विफलता — दस्तावेज़ SHA-256 स्टैम्प से मेल नहीं खाता। संभावित छेड़छाड़।",
+        "verify_generated": "दिए गए पाठ के लिए SHA-256 स्टैम्प उत्पन्न किया गया।"
     }
 }
 
@@ -713,6 +755,86 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace !important;
     }
 
+    /* ── SHA Verification Upgrade Styles ─────────────────────── */
+    .hash-display {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 0.78rem;
+        font-weight: 600;
+        word-break: break-all;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        padding: 8px 12px;
+        color: #071e3d;
+        letter-spacing: 0.4px;
+        line-height: 1.6;
+    }
+    .timestamp-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+        color: #1e40af;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+    .qr-stamp-container {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 10px;
+        padding: 14px 18px;
+        background: #f8fafc;
+        border: 1px dashed #071e3d;
+        border-radius: 8px;
+        flex-wrap: wrap;
+    }
+    .qr-stamp-container img {
+        border: 2px solid #071e3d;
+        border-radius: 6px;
+    }
+    .verify-panel {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-top: 4px solid #071e3d;
+        border-radius: 8px;
+        padding: 22px 24px;
+        margin-top: 14px;
+    }
+    .verify-result-pass {
+        background: #ecfdf5;
+        border: 1px solid #6ee7b7;
+        border-left: 5px solid #059669;
+        border-radius: 6px;
+        padding: 14px 18px;
+        margin-top: 14px;
+        font-weight: 600;
+        color: #065f46;
+        font-size: 0.92rem;
+    }
+    .verify-result-fail {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        border-left: 5px solid #dc2626;
+        border-radius: 6px;
+        padding: 14px 18px;
+        margin-top: 14px;
+        font-weight: 600;
+        color: #991b1b;
+        font-size: 0.92rem;
+    }
+    .verify-hash-output {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+    }
+
     /* Official Footer — Full Viewport Edge-to-Edge */
     .gov-footer {
         background: #071e3d;
@@ -1050,11 +1172,12 @@ with st.sidebar:
 # ─────────────────────────────────────────────────────────────────────────────
 # 📑 Main Navigation Tabs
 # ─────────────────────────────────────────────────────────────────────────────
-tab_search, tab_compare, tab_upload, tab_registry = st.tabs([
+tab_search, tab_compare, tab_upload, tab_registry, tab_verify = st.tabs([
     T["tab_search"],
     T["tab_compare"],
     T["tab_upload"],
-    T["tab_registry"]
+    T["tab_registry"],
+    T["tab_verify"]
 ])
 
 
@@ -1357,15 +1480,22 @@ with tab_search:
                         tender_text = tender.get("tender_clause_markdown", "")
                         st.code(tender_text, language="markdown")
 
-                        # Cryptographic Tamper-Proof Stamp
-                        sha_digest = compute_sha256(tender_text)
+                        # Cryptographic Tamper-Proof Stamp with Timestamp & QR
+                        sha_digest, sign_ts = compute_timestamped_sha256(tender_text)
+                        qr_b64 = generate_qr_code(f"SHA256:{sha_digest}|TS:{sign_ts}")
                         st.markdown(f"""
-                        <div class="tender-stamp">
+                        <div class="qr-stamp-container">
                             <div>
-                                🔒 <strong>Cryptographic Tamper-Evident Provenance:</strong> Generated by BIS AI Compliance Engine
+                                <img src="data:image/png;base64,{qr_b64}" width="110" height="110" alt="QR Verification Code" />
                             </div>
-                            <div>
-                                SHA-256 Stamp: <span class="stamp-badge">{sha_digest}</span>
+                            <div style="flex:1;">
+                                <div style="margin-bottom:6px;">
+                                    🔒 <strong>Cryptographic Tamper-Evident Provenance</strong> — BIS AI Compliance Engine
+                                </div>
+                                <div style="margin-bottom:6px;">
+                                    <span class="timestamp-badge">⏱ Signed: {sign_ts}</span>
+                                </div>
+                                <div class="hash-display">SHA-256: {sha_digest}</div>
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -1687,7 +1817,9 @@ with tab_upload:
             report_lines.append(f"")
             report_lines.append(f"=" * 60)
             report_lines.append(f"Generated by BIS Standards & Compliance Engine — Government of India")
-            report_lines.append(f"SHA-256 Audit Stamp: {compute_sha256(chr(10).join(report_lines))}")
+            audit_hash, audit_ts = compute_timestamped_sha256(chr(10).join(report_lines))
+            report_lines.append(f"Signed At (UTC): {audit_ts}")
+            report_lines.append(f"SHA-256 Audit Stamp: {audit_hash}")
 
             report_text = "\n".join(report_lines)
             st.download_button(
@@ -1697,6 +1829,80 @@ with tab_upload:
                 mime="text/plain",
                 use_container_width=True
             )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ── TAB 5: Document Integrity Verifier (SHA-256 Verification Tool)
+# ─────────────────────────────────────────────────────────────────────────────
+with tab_verify:
+    st.markdown(f"### {T['verify_title']}")
+    st.markdown(T["verify_desc"])
+
+    st.markdown('<div class="verify-panel">', unsafe_allow_html=True)
+
+    verify_text = st.text_area(
+        T["verify_input_label"],
+        height=200,
+        placeholder="Paste tender clause, compliance report, or any document text here...",
+        key="verify_doc_input"
+    )
+
+    verify_hash_input = st.text_input(
+        T["verify_hash_label"],
+        placeholder="e.g. A1B2C3D4E5F6... (64 hex characters)",
+        key="verify_hash_input"
+    )
+
+    verify_clicked = st.button(T["verify_btn"], type="primary", use_container_width=True, key="btn_verify_sha")
+
+    if verify_clicked and verify_text.strip():
+        computed_hash = compute_sha256(verify_text)
+        qr_data = f"SHA256:{computed_hash}|ENGINE:BIS-AI"
+        qr_b64 = generate_qr_code(qr_data)
+
+        # Show the computed hash + QR
+        st.markdown(f"""
+        <div class="verify-hash-output">
+            <div>
+                <img src="data:image/png;base64,{qr_b64}" width="130" height="130" alt="QR Code" />
+            </div>
+            <div style="flex:1;">
+                <div style="font-weight:700; margin-bottom:8px; color:#071e3d;">Computed SHA-256 Hash:</div>
+                <div class="hash-display">{computed_hash}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Verification logic
+        user_hash = verify_hash_input.strip().upper()
+        if user_hash:
+            if user_hash == computed_hash:
+                st.markdown(f'<div class="verify-result-pass">{T["verify_match"]}</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="verify-result-fail">{T["verify_mismatch"]}</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div style="margin-top:10px; font-size:0.82rem; color:#64748b;">
+                    <strong>Expected:</strong> <code>{user_hash}</code><br>
+                    <strong>Computed:</strong> <code>{computed_hash}</code>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="verify-result-pass" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af; border-left-color:#3b82f6;">📝 {T["verify_generated"]}</div>', unsafe_allow_html=True)
+
+    elif verify_clicked and not verify_text.strip():
+        st.warning("⚠️ Please paste document text to compute the hash.")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Informational section
+    st.markdown("---")
+    st.markdown("##### 🛡️ How Cryptographic Verification Works")
+    st.markdown("""
+    1. **SHA-256 Hashing** — The document text is processed through the SHA-256 cryptographic hash function, producing a unique 64-character fingerprint.
+    2. **Tamper Evidence** — Even a single character change in the document produces a completely different hash, making any modification instantly detectable.
+    3. **QR Code** — The hash is encoded into a QR code for easy scanning and offline verification.
+    4. **Timestamped Signing** — Tender clauses include a UTC timestamp embedded in the hash to prove when the document was generated.
+    """)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
