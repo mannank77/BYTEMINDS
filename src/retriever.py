@@ -1,20 +1,21 @@
 """
-BIS Standards Retriever — Hybrid BM25 + Semantic Embeddings
-============================================================
+BIS Standards Retriever — Hybrid BM25 + Semantic Embeddings (LanceDB)
+======================================================================
 Two retrieval modes depending on what is available at runtime:
 
   Mode A  (hybrid)  — BM25 score  +  cosine similarity from a local
                        sentence-transformers model, fused with a weighted sum.
                        Activated automatically when sentence-transformers is
-                       installed and the embedding cache exists.
+                       installed and the LanceDB table (or embedding cache) exists.
 
-  Mode B  (BM25-only) — identical to the original retriever; used as a
-                         graceful fallback so inference.py always works.
+  Mode B  (BM25-only) — used as a graceful fallback when embeddings are
+                         unavailable; inference.py always works.
+
+Building the LanceDB table (one-time):
+    python migrate_to_lancedb.py
 
 Building the embedding cache (one-time, ~30 s on CPU):
     python -c "from src.retriever import get_retriever; get_retriever()"
-
-Or run preprocess.py with --build-embeddings to do it as part of indexing.
 """
 
 from __future__ import annotations
@@ -128,8 +129,9 @@ def normalize_standard(standard: str) -> str:
 
 class BISRetriever:
     """
-    Hybrid retriever.  Falls back to BM25-only if sentence-transformers or
-    the embedding cache is not available.
+    Hybrid retriever using LanceDB for vector search and in-memory BM25 for
+    keyword matching.  Falls back to BM25-only if sentence-transformers or
+    the LanceDB table is not available.
     """
 
     def __init__(self, data_path: str | None = None, embedding_cache: str | None = None):
@@ -352,7 +354,7 @@ class BISRetriever:
             )[0]                                         # shape (dim,)
 
             if self.lancedb_table is not None:
-                # Optimized LanceDB search replacing raw NumPy dot product (self.embeddings @ q_vec)
+                # Optimized LanceDB search replacing raw NumPy dot product
                 lance_hits = (
                     self.lancedb_table.search(q_vec)
                     .metric("cosine")
@@ -402,7 +404,6 @@ class BISRetriever:
             for i, score in scored[:top_k]
         ]
 
-
     # ── Real-Time Dynamic Ingestion ──────────────────────────────────────────
 
     def add_document(
@@ -414,7 +415,8 @@ class BISRetriever:
         vector: list[float] | None = None,
     ) -> dict:
         """
-        Dynamically appends a new document embedding into LanceDB and updates the BM25 index in real-time.
+        Dynamically appends a new document embedding into LanceDB and updates
+        the BM25 index in real-time.
         """
         import uuid
         norm_std = normalize_standard(standard)
@@ -477,142 +479,15 @@ class BISRetriever:
         return False
 
 
-# ── Elasticsearch Retriever ──────────────────────────────────────────────────────
-
-ES_HOST = "http://localhost:9200"
-ALIAS_NAME = "bis_standards_active"
-
-
-class ElasticsearchRetriever:
-    """
-    Elasticsearch Hybrid Retriever (Lucene BM25 + HNSW Cosine Dense Vectors).
-    Gracefully falls back to in-memory BISRetriever if Elasticsearch is unreachable.
-    """
-
-    def __init__(self, es_host: str = ES_HOST, alias_name: str = ALIAS_NAME):
-        self.es_host = es_host
-        self.alias_name = alias_name
-        self.fallback: BISRetriever | None = None
-        self.embed_model = None
-
-        try:
-            from elasticsearch import Elasticsearch
-            self.es = Elasticsearch(es_host, request_timeout=2.0)
-        except Exception:
-            self.es = None
-
-        try:
-            from sentence_transformers import SentenceTransformer
-            self.embed_model = SentenceTransformer(EMBEDDING_MODEL)
-        except Exception:
-            self.embed_model = None
-
-    def is_available(self) -> bool:
-        if self.es is None:
-            return False
-        try:
-            return bool(self.es.ping()) and bool(self.es.indices.exists_alias(name=self.alias_name))
-        except Exception:
-            return False
-
-    def _fallback_retriever(self) -> BISRetriever:
-        if self.fallback is None:
-            self.fallback = BISRetriever()
-            if self.embed_model is not None and self.fallback.embed_model is None:
-                self.fallback.embed_model = self.embed_model
-        return self.fallback
-
-    def _extract_explicit_standards(self, query: str) -> list[str]:
-        """Extract explicit standard codes (e.g. IS 383, IS 1489 Part 1)."""
-        matches = re.findall(
-            r"\bIS\s*[:\-]?\s*(\d{2,5})(?:\s*\(?\s*Part\s*(\d+)\s*\)?)?",
-            query,
-            flags=re.I,
-        )
-        explicit_codes = []
-        for number, part in matches:
-            if part:
-                explicit_codes.append(f"IS {number} (Part {part})")
-            else:
-                explicit_codes.append(f"IS {number}")
-        return explicit_codes
-
-    def _expanded_query(self, query: str) -> str:
-        lowered = query.lower()
-        additions = [v for k, v in QUERY_EXPANSIONS.items() if k in lowered]
-        return " ".join([query, *additions])
-
-    def retrieve(self, query: str, top_k: int = 5) -> list[dict]:
-        if not self.is_available():
-            return self._fallback_retriever().retrieve(query, top_k=top_k)
-
-        expanded = self._expanded_query(query)
-        explicit_codes = self._extract_explicit_standards(query)
-
-        should_clauses: list[dict] = [
-            {
-                "multi_match": {
-                    "query": expanded,
-                    "fields": ["standard^8.0", "title^4.0", "category^2.0", "text^1.0"],
-                    "boost": BM25_WEIGHT,
-                }
-            }
-        ]
-
-        # Explicit code boost (+100.0)
-        for code in explicit_codes:
-            should_clauses.append({
-                "match_phrase": {
-                    "standard": {
-                        "query": code,
-                        "boost": EXPLICIT_BOOST,
-                    }
-                }
-            })
-
-        body: dict = {
-            "query": {
-                "bool": {
-                    "should": should_clauses
-                }
-            },
-            "size": top_k
-        }
-
-        # Add kNN dense vector clause if SentenceTransformer model is available
-        if self.embed_model is not None:
-            q_vec = self.embed_model.encode([expanded], normalize_embeddings=True)[0].tolist()
-            body["knn"] = {
-                "field": "embedding",
-                "query_vector": q_vec,
-                "k": max(top_k * 3, 10),
-                "num_candidates": 50,
-                "boost": SEMANTIC_WEIGHT,
-            }
-
-        try:
-            res = self.es.search(index=self.alias_name, body=body)
-            hits = res.get("hits", {}).get("hits", [])
-            return [
-                {
-                    "standard": hit["_source"]["standard"],
-                    "title": hit["_source"].get("title", ""),
-                    "score": hit.get("_score", 0.0),
-                }
-                for hit in hits
-            ]
-        except Exception as exc:
-            print(f"[retriever] Elasticsearch query error ({exc}) -> falling back to in-memory")
-            return self._fallback_retriever().retrieve(query, top_k=top_k)
-
-
 # ── Singleton ────────────────────────────────────────────────────────────────────
 
 @lru_cache(maxsize=1)
-def get_retriever():
-    es_retriever = ElasticsearchRetriever()
-    if es_retriever.is_available():
-        print("[retriever] Using ElasticsearchRetriever ('bis_standards_active')")
-        return es_retriever
-    print("[retriever] Using in-memory BISRetriever (fallback mode)")
-    return BISRetriever()
+def get_retriever() -> BISRetriever:
+    """
+    Returns the singleton BISRetriever, which uses LanceDB for vector search
+    and an in-memory BM25 index for keyword matching.
+    No external services or Docker required.
+    """
+    retriever = BISRetriever()
+    print("[retriever] Using BISRetriever with LanceDB + BM25 hybrid search.")
+    return retriever
