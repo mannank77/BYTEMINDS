@@ -156,7 +156,77 @@ TRANSLATIONS = {
         "verify_btn": "🔒 Compute Hash & Verify",
         "verify_match": "✅ INTEGRITY VERIFIED — Document matches the provided SHA-256 stamp. No tampering detected.",
         "verify_mismatch": "❌ INTEGRITY FAILURE — Document does NOT match the provided SHA-256 stamp. Possible tampering detected.",
-        "verify_generated": "SHA-256 stamp generated for the provided text."
+                                        "verify_generated": "SHA-256 stamp generated for the provided text.",
+        "notice_label": "বিজ্ঞপ্তি",
+        "warning_outdated": "পুরানো রেফারেন্স: '{std}'-এর পরিবর্তে '{cur}' এসেছে (SUPERSEDED)। প্রকল্প চুক্তিতে সর্বদা বর্তমান সক্রিয় সংশোধন উল্লেখ করুন।",
+        "current_bureau_code": "বর্তমান সক্রিয় ব্যুরো কোড:",
+        "lifecycle_status": "জীবনচক্রের অবস্থা:",
+        "base_family": "মূল পরিবার:",
+        "standard_type": "মান প্রকার:",
+        "standard_type_val": "ভারতীয় জাতীয় মান (BIS)",
+        "consolidation_summary": "একত্রীকরণ এবং সুযোগ সারাংশ:",
+        "active_amendments": "সক্রিয় গেজেট সংশোধন:",
+        "amendment_no": "সংশোধন #{no} ({year}):",
+        "mandatory_tests": "বাধ্যতামূলক গুণমান গ্রহণযোগ্যতা এবং পরীক্ষাগার পরীক্ষা মান",
+        "allied_codes": "সম্পর্কিত অনুশীলন কোড এবং ইঞ্জিনিয়ারিং নির্দেশিকা",
+        "current_active_version": "বর্তমান সক্রিয় সংস্করণ:",
+        "historical_superseded": "ঐতিহাসিক বাতিলকৃত কোড:",
+        "gazette_amendments": "গেজেট সংশোধন:",
+        "superseded_by": "দ্বারা প্রতিস্থাপিত",
+        "status_superseded": "SUPERSEDED",
+        "status_active": "ACTIVE"
+,
+        "notice_label": "கவனம்",
+        "warning_outdated": "பழைய குறிப்பு: '{std}' க்கு பதிலாக '{cur}' வந்துவிட்டது (SUPERSEDED). திட்ட ஒப்பந்தங்களில் எப்போதும் தற்போதைய திருத்தத்தையே குறிப்பிடவும்.",
+        "current_bureau_code": "தற்போதைய செயலில் உள்ள பீரோ குறியீடு:",
+        "lifecycle_status": "வாழ்க்கை சுழற்சி நிலை:",
+        "base_family": "அடிப்படை குடும்பம்:",
+        "standard_type": "தரநிலை வகை:",
+        "standard_type_val": "இந்திய தேசிய தரநிலை (BIS)",
+        "consolidation_summary": "ஒருங்கிணைப்பு மற்றும் நோக்கம் சுருக்கம்:",
+        "active_amendments": "செயலில் உள்ள அரசிதழ் திருத்தங்கள்:",
+        "amendment_no": "திருத்தம் #{no} ({year}):",
+        "mandatory_tests": "கட்டாய தர ஏற்றுக்கொள்ளல் & ஆய்வக சோதனை தரநிலைகள்",
+        "allied_codes": "தொடர்புடைய நடைமுறை குறியீடுகள் & பொறியியல் வழிகாட்டுதல்கள்",
+        "current_active_version": "தற்போதைய செயலில் உள்ள பதிப்பு:",
+        "historical_superseded": "வரலாற்று மாற்றப்பட்ட குறியீடுகள்:",
+        "gazette_amendments": "அரசிதழ் திருத்தங்கள்:",
+        "superseded_by": "இதனால் மாற்றப்பட்டது"
+,
+        "notice_label": "గమనిక",
+        "warning_outdated": "పాత సూచన: '{std}' స్థానంలో '{cur}' వచ్చింది (SUPERSEDED). ప్రాజెక్ట్ ఒప్పందాలలో ఎల్లప్పుడూ ప్రస్తుత సవరణను సూచించండి.",
+        "current_bureau_code": "ప్రస్తుత యాక్టివ్ బ్యూరో కోడ్:",
+        "lifecycle_status": "జీవితచక్ర స్థితి:",
+        "base_family": "బేస్ ఫ్యామిలీ:",
+        "standard_type": "ప్రామాణిక రకం:",
+        "standard_type_val": "భారత జాతీయ ప్రమాణం (BIS)",
+        "consolidation_summary": "ఏకీకరణ & పరిధి సారాంశం:",
+        "active_amendments": "క్రియాశీల గెజిట్ సవరణలు:",
+        "amendment_no": "సవరణ #{no} ({year}):",
+        "mandatory_tests": "తప్పనిసరి నాణ్యత అంగీకారం & ప్రయోగశాల పరీక్ష ప్రమాణాలు",
+        "allied_codes": "అనుబంధ ప్రాక్టీస్ కోడ్‌లు & ఇంజనీరింగ్ మార్గదర్శకాలు",
+        "current_active_version": "ప్రస్తుత సక్రియ వెర్షన్:",
+        "historical_superseded": "చారిత్రక రద్దు చేయబడిన కోడ్‌లు:",
+        "gazette_amendments": "గెజిట్ సవరణలు:",
+        "superseded_by": "దీని ద్వారా భర్తీ చేయబడింది"
+,
+        "notice_label": "Notice",
+        "warning_outdated": "Outdated Reference: '{std}' has been SUPERSEDED by '{cur}'. Always reference the current active revision in project contracts.",
+        "current_bureau_code": "Current Active Bureau Code:",
+        "lifecycle_status": "Lifecycle Status:",
+        "base_family": "Base Family:",
+        "standard_type": "Standard Type:",
+        "standard_type_val": "Indian National Standard (BIS)",
+        "consolidation_summary": "Consolidation & Scope Summary:",
+        "active_amendments": "Active Gazette Amendments:",
+        "amendment_no": "Amendment #{no} ({year}):",
+        "mandatory_tests": "Mandatory Quality Acceptance & Laboratory Test Standards",
+        "allied_codes": "Allied Codes of Practice & Engineering Guidelines",
+        "current_active_version": "Current Active Version:",
+        "historical_superseded": "Historical Superseded Codes:",
+        "gazette_amendments": "Gazette Amendments:",
+        "superseded_by": "Superseded by"
+
     },
     "हिन्दी (Hindi)": {
         "portal_title": "भारतीय मानक ब्यूरो (BIS) — मानक एवं विनियामक अनुपालन प्रणाली",
@@ -202,7 +272,26 @@ TRANSLATIONS = {
         "verify_btn": "🔒 हैश गणना करें एवं सत्यापित करें",
         "verify_match": "✅ अखंडता सत्यापित — दस्तावेज़ SHA-256 स्टैम्प से मेल खाता है। कोई छेड़छाड़ नहीं।",
         "verify_mismatch": "❌ अखंडता विफलता — दस्तावेज़ SHA-256 स्टैम्प से मेल नहीं खाता। संभावित छेड़छाड़।",
-        "verify_generated": "दिए गए पाठ के लिए SHA-256 स्टैम्प उत्पन्न किया गया।"
+                "verify_generated": "दिए गए पाठ के लिए SHA-256 स्टैम्प उत्पन्न किया गया।",
+        "notice_label": "सूचना",
+        "warning_outdated": "पुराना संदर्भ: '{std}' को '{cur}' द्वारा प्रतिस्थापित (SUPERSEDED) किया गया है। हमेशा प्रोजेक्ट अनुबंधों में वर्तमान सक्रिय संशोधन का संदर्भ लें।",
+        "current_bureau_code": "वर्तमान सक्रिय ब्यूरो कोड:",
+        "lifecycle_status": "जीवनचक्र स्थिति:",
+        "base_family": "मूल परिवार:",
+        "standard_type": "मानक प्रकार:",
+        "standard_type_val": "भारतीय राष्ट्रीय मानक (BIS)",
+        "consolidation_summary": "समेकन एवं दायरा सारांश:",
+        "active_amendments": "सक्रिय राजपत्र संशोधन:",
+        "amendment_no": "संशोधन #{no} ({year}):",
+        "mandatory_tests": "अनिवार्य गुणवत्ता स्वीकृति एवं प्रयोगशाला परीक्षण मानक",
+        "allied_codes": "संबद्ध अभ्यास संहिता एवं इंजीनियरिंग दिशानिर्देश",
+        "current_active_version": "वर्तमान सक्रिय संस्करण:",
+        "historical_superseded": "ऐतिहासिक प्रतिस्थापित कोड:",
+        "gazette_amendments": "राजपत्र संशोधन:",
+        "superseded_by": "द्वारा प्रतिस्थापित",
+        "status_superseded": "प्रतिस्थापित",
+        "status_active": "सक्रिय"
+
     },
     "తెలుగు (Telugu)": {
         "portal_title": "బ్యూరో ఆఫ్ ఇండియన్ స్టాండర్డ్స్ (BIS) — ప్రమాణాలు & సమ్మతి",
@@ -1474,10 +1563,19 @@ with tab_search:
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if curr.get("warning_message"):
+                    if curr.get("is_current") is False:
+                        std_id = curr.get("query_id", "")
+                        cur_ver = curr.get("current_version", "")
+                        warning_msg = T.get('warning_outdated', "Outdated Reference: '{std}' has been SUPERSEDED by '{cur}'. Always reference the current active revision in project contracts.").format(std=std_id, cur=cur_ver)
                         st.markdown(f"""
                         <div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #92400e; margin-bottom: 12px;">
-                            ⚠️ <strong>Notice:</strong> {curr["warning_message"]}
+                            ⚠️ <strong>{T.get('notice_label', 'Notice')}:</strong> {warning_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    elif curr.get("warning_message"):
+                        st.markdown(f"""
+                        <div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; color: #92400e; margin-bottom: 12px;">
+                            ⚠️ <strong>{T.get('notice_label', 'Notice')}:</strong> {{curr["warning_message"]}}
                         </div>
                         """, unsafe_allow_html=True)
 
@@ -1494,23 +1592,26 @@ with tab_search:
                     with st_tab1:
                         c1, c2 = st.columns(2)
                         with c1:
-                            st.markdown(f"**Current Active Bureau Code:** `{curr.get('current_version')}`")
-                            st.markdown(f"**Lifecycle Status:** `{curr.get('status')}`")
+                            st.markdown(f"**{T.get('current_bureau_code', 'Current Active Bureau Code:')}** `{curr.get('current_version')}`")
+                            status_raw = curr.get('status', '')
+                            status_display = T.get('status_superseded', 'SUPERSEDED') if 'SUPERSEDED' in status_raw else T.get('status_active', 'ACTIVE') if 'ACTIVE' in status_raw else status_raw
+                            st.markdown(f"**{T.get('lifecycle_status', 'Lifecycle Status:')}** `{status_display}`")
                         with c2:
-                            st.markdown(f"**Base Family:** `{curr.get('base_code')}`")
-                            st.markdown(f"**Standard Type:** Indian National Standard (BIS)")
+                            st.markdown(f"**{T.get('base_family', 'Base Family:')}** `{curr.get('base_code')}`")
+                            st.markdown(f"**{T.get('standard_type', 'Standard Type:')}** {T.get('standard_type_val', 'Indian National Standard (BIS)')}")
 
                         if curr.get("consolidation_summary"):
-                            st.info(f"ℹ️ **Consolidation & Scope Summary:** {curr.get('consolidation_summary')}")
+                            st.info(f"ℹ️ **{T.get('consolidation_summary', 'Consolidation & Scope Summary:')}** {curr.get('consolidation_summary')}")
 
                         if curr.get("latest_amendments"):
-                            st.markdown("##### 📜 Active Gazette Amendments:")
+                            st.markdown(f"##### 📜 {T.get('active_amendments', 'Active Gazette Amendments:')}")
                             for amd in curr.get("latest_amendments", []):
-                                st.markdown(f"- **Amendment #{amd['amendment_no']} ({amd['year']}):** {amd['summary']}")
+                                amd_str = T.get('amendment_no', 'Amendment #{no} ({year}):').format(no=amd['amendment_no'], year=amd['year'])
+                                st.markdown(f"- **{amd_str}** {amd['summary']}")
 
                     # ── Sub-Tab 2: Normative Tests ──
                     with st_tab2:
-                        st.markdown("##### 🔬 Mandatory Quality Acceptance & Laboratory Test Standards")
+                        st.markdown(f"##### 🔬 {T.get('mandatory_tests', 'Mandatory Quality Acceptance & Laboratory Test Standards')}")
                         test_methods = norm.get("mandatory_test_methods", [])
                         if test_methods:
                             for tm in test_methods:
@@ -1522,7 +1623,7 @@ with tab_search:
                         else:
                             st.caption("Standard testing protocols specified directly in the parent code.")
 
-                        st.markdown("##### 📐 Allied Codes of Practice & Engineering Guidelines")
+                        st.markdown(f"##### 📐 {T.get('allied_codes', 'Allied Codes of Practice & Engineering Guidelines')}")
                         allied = norm.get("allied_codes_of_practice", [])
                         if allied:
                             for al in allied:
@@ -1763,21 +1864,24 @@ with tab_registry:
         if search_reg.lower() in code.lower() or search_reg.lower() in info.get("title", "").lower() or not search_reg:
             badge = f"🟢 {T['badge_active']}" if info.get("status") == "ACTIVE" else f"⚠️ {T['badge_superseded']}"
             with st.expander(f"📘 {code}: {info.get('title')} — [{badge}]"):
-                st.markdown(f"- **Current Active Version:** `{info.get('current_version')}`")
-                st.markdown(f"- **Lifecycle Status:** `{info.get('status')}`")
-                st.markdown(f"- **Consolidation Summary:** {info.get('consolidation_summary')}")
+                st.markdown(f"- **{T.get('current_active_version', 'Current Active Version:')}** `{info.get('current_version')}`")
+                status_raw = info.get('status', '')
+                status_display = T.get('status_superseded', 'SUPERSEDED') if 'SUPERSEDED' in status_raw else T.get('status_active', 'ACTIVE') if 'ACTIVE' in status_raw else status_raw
+                st.markdown(f"- **{T.get('lifecycle_status', 'Lifecycle Status:')}** `{status_display}`")
+                st.markdown(f"- **{T.get('consolidation_summary', 'Consolidation Summary:')}** {info.get('consolidation_summary')}")
 
                 hist = info.get("historical_versions", [])
                 if hist:
-                    st.markdown("- **Historical Superseded Codes:**")
+                    st.markdown(f"- **{T.get('historical_superseded', 'Historical Superseded Codes:')}**")
                     for h in hist:
-                        st.markdown(f"  - `{h['code']}` ({h.get('title')}) — Superseded by `{h.get('superseded_by')}`")
+                        st.markdown(f"  - `{h['code']}` ({h.get('title')}) — {T.get('superseded_by', 'Superseded by')} `{h.get('superseded_by')}`")
 
                 amds = info.get("latest_amendments", [])
                 if amds:
-                    st.markdown("- **Gazette Amendments:**")
+                    st.markdown(f"- **{T.get('gazette_amendments', 'Gazette Amendments:')}**")
                     for a in amds:
-                        st.markdown(f"  - Amendment #{a['amendment_no']} ({a['year']}): {a['summary']}")
+                        amd_str = T.get('amendment_no', 'Amendment #{no} ({year}):').format(no=a['amendment_no'], year=a['year'])
+                        st.markdown(f"  - {amd_str} {a['summary']}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
