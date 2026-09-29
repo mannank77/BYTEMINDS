@@ -56,6 +56,7 @@ class CurrencyManager:
 
         if not info:
             return {
+                "query_id": standard_id,
                 "base_code": base_code,
                 "current_version": standard_id,
                 "status": "ACTIVE (Assumed)",
@@ -85,6 +86,7 @@ class CurrencyManager:
                 )
 
         return {
+            "query_id": standard_id,
             "base_code": base_code,
             "title": info.get("title", ""),
             "current_version": info.get("current_version", standard_id),
