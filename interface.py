@@ -13,6 +13,7 @@ import io
 from datetime import datetime, timezone
 import streamlit as st
 import qrcode
+from docx import Document
 
 from src.retriever import get_retriever
 from src.pipeline import run_enriched_pipeline, get_query_validation
@@ -69,6 +70,42 @@ def generate_qr_code(data: str) -> str:
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+
+def create_docx_tender(tender_text: str, qa_items: list, sha_digest: str, sign_ts: str) -> io.BytesIO:
+    """Generate a DOCX file containing the tender specification and QA checklist."""
+    doc = Document()
+    doc.add_heading('GeM / CPWD Form Technical Tender Clause', 0)
+    
+    doc.add_heading('Tender Specification', level=1)
+    doc.add_paragraph(tender_text)
+    
+    doc.add_heading('Actionable Site QA & Bidder Inspection Checklist', level=1)
+    for chk in qa_items:
+        doc.add_paragraph(f"Step {chk.get('step', '')}: {chk.get('action', '')}", style='List Bullet')
+        
+    doc.add_heading('Cryptographic Tamper-Evident Provenance', level=1)
+    doc.add_paragraph(f"Signed At: {sign_ts}")
+    doc.add_paragraph(f"SHA-256 Digest: {sha_digest}")
+    
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    return buffer
+
+
+def create_markdown_tender(tender_text: str, qa_items: list, sha_digest: str, sign_ts: str) -> str:
+    """Generate a Markdown string containing the tender specification and QA checklist."""
+    md = "# GeM / CPWD Form Technical Tender Clause\n\n"
+    md += "## Tender Specification\n"
+    md += f"{tender_text}\n\n"
+    md += "## Actionable Site QA & Bidder Inspection Checklist\n"
+    for chk in qa_items:
+        md += f"- **Step {chk.get('step', '')}**: {chk.get('action', '')}\n"
+    md += "\n## Cryptographic Tamper-Evident Provenance\n"
+    md += f"- **Signed At:** {sign_ts}\n"
+    md += f"- **SHA-256 Digest:** {sha_digest}\n"
+    return md
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -166,6 +203,144 @@ TRANSLATIONS = {
         "verify_match": "✅ अखंडता सत्यापित — दस्तावेज़ SHA-256 स्टैम्प से मेल खाता है। कोई छेड़छाड़ नहीं।",
         "verify_mismatch": "❌ अखंडता विफलता — दस्तावेज़ SHA-256 स्टैम्प से मेल नहीं खाता। संभावित छेड़छाड़।",
         "verify_generated": "दिए गए पाठ के लिए SHA-256 स्टैम्प उत्पन्न किया गया।"
+    },
+    "తెలుగు (Telugu)": {
+        "portal_title": "బ్యూరో ఆఫ్ ఇండియన్ స్టాండర్డ్స్ (BIS) — ప్రమాణాలు & సమ్మతి",
+        "portal_sub": "జాతీయ నియంత్రణ ఇంటెలిజెన్స్, QCO ధృవీకరణ & GeM/CPWD టెండర్ జనరేటర్",
+        "active_status": "పోర్టల్ యాక్టివ్ (BIS చట్టం 2016)",
+        "gazette_ticker": "Mandatory ISI Certification Mark (Scheme-I) enforced under BIS Act 2016 for Structural Steel (IS 1786), Hydraulic Cements (IS 269), Aggregates (IS 383), and Precast Concrete. Non-compliance invites penal proceedings under Section 29.",
+        "search_label": "శోధన ప్రశ్న నమోదు చేయండి",
+        "search_placeholder": "ఉదాహరణకు: కాంక్రీట్ కోసం ఇసుక, లేదా స్టీల్...",
+        "btn_search": "ప్రమాణాలను శోధించండి",
+        "btn_clear": "Clear Search",
+        "tab_search": "🔍 Smart Search & Complete Specification",
+        "tab_compare": "🔄 Side-by-Side Scope Comparator",
+        "tab_registry": "📜 Standards & QCO Registry Browser",
+        "subtab_overview": "📌 Overview & Gazette Currency",
+        "subtab_normative": "🔬 Normative Tests & Allied Codes",
+        "subtab_params": "📊 Technical Parameters & Limits",
+        "subtab_qco": "🏛️ Statutory QCO & Legal Mandate",
+        "subtab_tender": "📝 GeM/CPWD Tender Clause & Site QA",
+        "metric_recommended": "Standards Recommended",
+        "metric_latency": "Hybrid Search & Graph Latency",
+        "metric_qco": "QCO Scheme-I Verification",
+        "metric_offline": "Air-Gapped & Zero-Data-Leakage",
+        "sidebar_control": "Control & Filter Panel",
+        "sidebar_control_sub": "Search parameters & regulatory filter settings",
+        "sidebar_guardrail": "Enable LLM Guardrail (Ollama)",
+        "sidebar_topk": "Recommendations Count (Top-K)",
+        "sidebar_quick_queries": "Standard Technical Queries",
+        "sidebar_protocols": "Engine Verification Protocols",
+        "badge_active": "ACTIVE",
+        "badge_superseded": "SUPERSEDED BY",
+        "badge_qco": "MANDATORY QCO (ISI MARK)",
+        "badge_voluntary": "VOLUNTARY / STANDARD",
+        "tab_upload": "📄 Document Upload & Compliance Audit",
+        "upload_title": "Upload Tender Document for Automated BIS Compliance Audit",
+        "upload_desc": "Upload a tender specification, procurement document, or technical schedule (PDF, DOCX, TXT) and the AI engine will automatically detect IS code references, flag outdated standards, identify missing normative test methods, and recommend additional standards.",
+        "upload_btn": "Upload tender document (.pdf, .docx, .txt)",
+        "upload_analyzing": "Analyzing document...",
+        "tab_verify": "🔐 Document Integrity Verifier",
+        "verify_title": "Cryptographic Document Integrity Verification",
+        "verify_desc": "Paste any tender clause, compliance report, or document text below along with its SHA-256 stamp to verify tamper-evidence. Or generate a new stamp for any text.",
+        "verify_input_label": "Paste Document / Tender Text",
+        "verify_hash_label": "Paste SHA-256 Stamp to Verify (optional)",
+        "verify_btn": "🔒 Compute Hash & Verify",
+        "verify_match": "✅ INTEGRITY VERIFIED — Document matches the provided SHA-256 stamp. No tampering detected.",
+        "verify_mismatch": "❌ INTEGRITY FAILURE — Document does NOT match the provided SHA-256 stamp. Possible tampering detected.",
+        "verify_generated": "SHA-256 stamp generated for the provided text."
+    },
+    "தமிழ் (Tamil)": {
+        "portal_title": "இந்திய தர நிர்ணய பணியகம் (BIS) — தரநிலைகள் & இணக்கம்",
+        "portal_sub": "தேசிய ஒழுங்குமுறை உளவுத்துறை, QCO சரிபார்ப்பு & GeM/CPWD டெண்டர் ஜெனரேட்டர்",
+        "active_status": "போர்டல் ஆக்டிவ் (BIS சட்டம் 2016)",
+        "gazette_ticker": "Mandatory ISI Certification Mark (Scheme-I) enforced under BIS Act 2016 for Structural Steel (IS 1786), Hydraulic Cements (IS 269), Aggregates (IS 383), and Precast Concrete. Non-compliance invites penal proceedings under Section 29.",
+        "search_label": "தேடல் வினவலை உள்ளிடவும்",
+        "search_placeholder": "உதாரணமாக: கான்கிரீட்டிற்கான மணல், அல்லது கம்பி...",
+        "btn_search": "தரநிலைகளைத் தேடுங்கள்",
+        "btn_clear": "Clear Search",
+        "tab_search": "🔍 Smart Search & Complete Specification",
+        "tab_compare": "🔄 Side-by-Side Scope Comparator",
+        "tab_registry": "📜 Standards & QCO Registry Browser",
+        "subtab_overview": "📌 Overview & Gazette Currency",
+        "subtab_normative": "🔬 Normative Tests & Allied Codes",
+        "subtab_params": "📊 Technical Parameters & Limits",
+        "subtab_qco": "🏛️ Statutory QCO & Legal Mandate",
+        "subtab_tender": "📝 GeM/CPWD Tender Clause & Site QA",
+        "metric_recommended": "Standards Recommended",
+        "metric_latency": "Hybrid Search & Graph Latency",
+        "metric_qco": "QCO Scheme-I Verification",
+        "metric_offline": "Air-Gapped & Zero-Data-Leakage",
+        "sidebar_control": "Control & Filter Panel",
+        "sidebar_control_sub": "Search parameters & regulatory filter settings",
+        "sidebar_guardrail": "Enable LLM Guardrail (Ollama)",
+        "sidebar_topk": "Recommendations Count (Top-K)",
+        "sidebar_quick_queries": "Standard Technical Queries",
+        "sidebar_protocols": "Engine Verification Protocols",
+        "badge_active": "ACTIVE",
+        "badge_superseded": "SUPERSEDED BY",
+        "badge_qco": "MANDATORY QCO (ISI MARK)",
+        "badge_voluntary": "VOLUNTARY / STANDARD",
+        "tab_upload": "📄 Document Upload & Compliance Audit",
+        "upload_title": "Upload Tender Document for Automated BIS Compliance Audit",
+        "upload_desc": "Upload a tender specification, procurement document, or technical schedule (PDF, DOCX, TXT) and the AI engine will automatically detect IS code references, flag outdated standards, identify missing normative test methods, and recommend additional standards.",
+        "upload_btn": "Upload tender document (.pdf, .docx, .txt)",
+        "upload_analyzing": "Analyzing document...",
+        "tab_verify": "🔐 Document Integrity Verifier",
+        "verify_title": "Cryptographic Document Integrity Verification",
+        "verify_desc": "Paste any tender clause, compliance report, or document text below along with its SHA-256 stamp to verify tamper-evidence. Or generate a new stamp for any text.",
+        "verify_input_label": "Paste Document / Tender Text",
+        "verify_hash_label": "Paste SHA-256 Stamp to Verify (optional)",
+        "verify_btn": "🔒 Compute Hash & Verify",
+        "verify_match": "✅ INTEGRITY VERIFIED — Document matches the provided SHA-256 stamp. No tampering detected.",
+        "verify_mismatch": "❌ INTEGRITY FAILURE — Document does NOT match the provided SHA-256 stamp. Possible tampering detected.",
+        "verify_generated": "SHA-256 stamp generated for the provided text."
+    },
+    "বাংলা (Bengali)": {
+        "portal_title": "ভারতীয় মান ব্যুরো (BIS) — মান এবং সম্মতি",
+        "portal_sub": "জাতীয় নিয়ন্ত্রক বুদ্ধিমত্তা, QCO যাচাইকরণ এবং GeM/CPWD টেন্ডার জেনারেটর",
+        "active_status": "পোর্টাল সক্রিয় (BIS আইন 2016)",
+        "gazette_ticker": "Mandatory ISI Certification Mark (Scheme-I) enforced under BIS Act 2016 for Structural Steel (IS 1786), Hydraulic Cements (IS 269), Aggregates (IS 383), and Precast Concrete. Non-compliance invites penal proceedings under Section 29.",
+        "search_label": "অনুসন্ধান প্রশ্ন লিখুন",
+        "search_placeholder": "উদাহরণস্বরূপ: কংক্রিটের জন্য বালি, বা রড...",
+        "btn_search": "মান অনুসন্ধান করুন",
+        "btn_clear": "Clear Search",
+        "tab_search": "🔍 Smart Search & Complete Specification",
+        "tab_compare": "🔄 Side-by-Side Scope Comparator",
+        "tab_registry": "📜 Standards & QCO Registry Browser",
+        "subtab_overview": "📌 Overview & Gazette Currency",
+        "subtab_normative": "🔬 Normative Tests & Allied Codes",
+        "subtab_params": "📊 Technical Parameters & Limits",
+        "subtab_qco": "🏛️ Statutory QCO & Legal Mandate",
+        "subtab_tender": "📝 GeM/CPWD Tender Clause & Site QA",
+        "metric_recommended": "Standards Recommended",
+        "metric_latency": "Hybrid Search & Graph Latency",
+        "metric_qco": "QCO Scheme-I Verification",
+        "metric_offline": "Air-Gapped & Zero-Data-Leakage",
+        "sidebar_control": "Control & Filter Panel",
+        "sidebar_control_sub": "Search parameters & regulatory filter settings",
+        "sidebar_guardrail": "Enable LLM Guardrail (Ollama)",
+        "sidebar_topk": "Recommendations Count (Top-K)",
+        "sidebar_quick_queries": "Standard Technical Queries",
+        "sidebar_protocols": "Engine Verification Protocols",
+        "badge_active": "ACTIVE",
+        "badge_superseded": "SUPERSEDED BY",
+        "badge_qco": "MANDATORY QCO (ISI MARK)",
+        "badge_voluntary": "VOLUNTARY / STANDARD",
+        "tab_upload": "📄 Document Upload & Compliance Audit",
+        "upload_title": "Upload Tender Document for Automated BIS Compliance Audit",
+        "upload_desc": "Upload a tender specification, procurement document, or technical schedule (PDF, DOCX, TXT) and the AI engine will automatically detect IS code references, flag outdated standards, identify missing normative test methods, and recommend additional standards.",
+        "upload_btn": "Upload tender document (.pdf, .docx, .txt)",
+        "upload_analyzing": "Analyzing document...",
+        "tab_verify": "🔐 Document Integrity Verifier",
+        "verify_title": "Cryptographic Document Integrity Verification",
+        "verify_desc": "Paste any tender clause, compliance report, or document text below along with its SHA-256 stamp to verify tamper-evidence. Or generate a new stamp for any text.",
+        "verify_input_label": "Paste Document / Tender Text",
+        "verify_hash_label": "Paste SHA-256 Stamp to Verify (optional)",
+        "verify_btn": "🔒 Compute Hash & Verify",
+        "verify_match": "✅ INTEGRITY VERIFIED — Document matches the provided SHA-256 stamp. No tampering detected.",
+        "verify_mismatch": "❌ INTEGRITY FAILURE — Document does NOT match the provided SHA-256 stamp. Possible tampering detected.",
+        "verify_generated": "SHA-256 stamp generated for the provided text."
     }
 }
 
@@ -888,7 +1063,7 @@ with c_bar1:
 with c_bar2:
     selected_lang = st.selectbox(
         "Language",
-        ["English", "हिन्दी (Hindi)"],
+        ["English", "हिन्दी (Hindi)", "తెలుగు (Telugu)", "தமிழ் (Tamil)", "বাংলা (Bengali)"],
         index=0,
         label_visibility="collapsed",
         key="portal_lang"
@@ -1506,6 +1681,31 @@ with tab_search:
                         qa_items = tender.get("qa_checklist", [])
                         for chk in qa_items:
                             st.checkbox(f"**Step {chk['step']}**: {chk['action']}", value=False, key=f"chk_{rank}_{chk['step']}")
+
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown("##### 📥 Export Tender Document")
+                        
+                        col_btn1, col_btn2 = st.columns([1, 2])
+                        with col_btn1:
+                            # Generate DOCX
+                            docx_buffer = create_docx_tender(tender_text, qa_items, sha_digest, sign_ts)
+                            st.download_button(
+                                label="Download as DOCX",
+                                data=docx_buffer,
+                                file_name=f"Tender_Spec_{curr.get('current_version', 'Doc').replace(' ', '_')}.docx",
+                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                key=f"btn_docx_{rank}"
+                            )
+                        with col_btn2:
+                            # Generate Markdown
+                            md_text = create_markdown_tender(tender_text, qa_items, sha_digest, sign_ts)
+                            st.download_button(
+                                label="Download as Markdown",
+                                data=md_text,
+                                file_name=f"Tender_Spec_{curr.get('current_version', 'Doc').replace(' ', '_')}.md",
+                                mime="text/markdown",
+                                key=f"btn_md_{rank}"
+                            )
 
                     st.markdown("---")
 
