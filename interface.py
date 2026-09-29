@@ -13,6 +13,7 @@ import io
 from datetime import datetime, timezone
 import streamlit as st
 import qrcode
+from docx import Document
 
 from src.retriever import get_retriever
 from src.pipeline import run_enriched_pipeline, get_query_validation
@@ -69,6 +70,42 @@ def generate_qr_code(data: str) -> str:
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+
+def create_docx_tender(tender_text: str, qa_items: list, sha_digest: str, sign_ts: str) -> io.BytesIO:
+    """Generate a DOCX file containing the tender specification and QA checklist."""
+    doc = Document()
+    doc.add_heading('GeM / CPWD Form Technical Tender Clause', 0)
+    
+    doc.add_heading('Tender Specification', level=1)
+    doc.add_paragraph(tender_text)
+    
+    doc.add_heading('Actionable Site QA & Bidder Inspection Checklist', level=1)
+    for chk in qa_items:
+        doc.add_paragraph(f"Step {chk.get('step', '')}: {chk.get('action', '')}", style='List Bullet')
+        
+    doc.add_heading('Cryptographic Tamper-Evident Provenance', level=1)
+    doc.add_paragraph(f"Signed At: {sign_ts}")
+    doc.add_paragraph(f"SHA-256 Digest: {sha_digest}")
+    
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    return buffer
+
+
+def create_markdown_tender(tender_text: str, qa_items: list, sha_digest: str, sign_ts: str) -> str:
+    """Generate a Markdown string containing the tender specification and QA checklist."""
+    md = "# GeM / CPWD Form Technical Tender Clause\n\n"
+    md += "## Tender Specification\n"
+    md += f"{tender_text}\n\n"
+    md += "## Actionable Site QA & Bidder Inspection Checklist\n"
+    for chk in qa_items:
+        md += f"- **Step {chk.get('step', '')}**: {chk.get('action', '')}\n"
+    md += "\n## Cryptographic Tamper-Evident Provenance\n"
+    md += f"- **Signed At:** {sign_ts}\n"
+    md += f"- **SHA-256 Digest:** {sha_digest}\n"
+    return md
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1506,6 +1543,31 @@ with tab_search:
                         qa_items = tender.get("qa_checklist", [])
                         for chk in qa_items:
                             st.checkbox(f"**Step {chk['step']}**: {chk['action']}", value=False, key=f"chk_{rank}_{chk['step']}")
+
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown("##### 📥 Export Tender Document")
+                        
+                        col_btn1, col_btn2 = st.columns([1, 2])
+                        with col_btn1:
+                            # Generate DOCX
+                            docx_buffer = create_docx_tender(tender_text, qa_items, sha_digest, sign_ts)
+                            st.download_button(
+                                label="Download as DOCX",
+                                data=docx_buffer,
+                                file_name=f"Tender_Spec_{curr.get('current_version', 'Doc').replace(' ', '_')}.docx",
+                                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                key=f"btn_docx_{rank}"
+                            )
+                        with col_btn2:
+                            # Generate Markdown
+                            md_text = create_markdown_tender(tender_text, qa_items, sha_digest, sign_ts)
+                            st.download_button(
+                                label="Download as Markdown",
+                                data=md_text,
+                                file_name=f"Tender_Spec_{curr.get('current_version', 'Doc').replace(' ', '_')}.md",
+                                mime="text/markdown",
+                                key=f"btn_md_{rank}"
+                            )
 
                     st.markdown("---")
 

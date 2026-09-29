@@ -12,3 +12,4 @@ pyarrow
 pandas
 fastapi
 uvicorn
+python-docx
