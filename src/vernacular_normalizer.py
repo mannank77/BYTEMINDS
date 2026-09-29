@@ -30,9 +30,9 @@ class VernacularNormalizer:
             self.exact_mappings = {}
             self.keywords = {}
 
-    def is_devanagari(self, text: str) -> bool:
-        """Check if query contains Devanagari / Hindi unicode characters."""
-        return bool(re.search(r"[\u0900-\u097F]", text))
+    def is_indic_script(self, text: str) -> bool:
+        """Check if query contains Devanagari, Bengali, Tamil, or Telugu unicode characters."""
+        return bool(re.search(r"[\u0900-\u097F\u0980-\u09FF\u0B80-\u0BFF\u0C00-\u0C7F]", text))
 
     def normalize_query(self, query: str) -> Tuple[str, Dict[str, Any]]:
         """
@@ -40,15 +40,15 @@ class VernacularNormalizer:
         """
         raw_query = query.strip()
         lower_query = raw_query.lower()
-        has_devanagari = self.is_devanagari(raw_query)
+        has_indic = self.is_indic_script(raw_query)
 
         detected_terms = []
         expanded_parts = [raw_query]
 
         # 1. Exact match check
         for vern_key, eng_expansion in self.exact_mappings.items():
-            pattern = rf"\b{re.escape(vern_key.lower())}\b" if not self.is_devanagari(vern_key) else re.escape(vern_key)
-            if re.search(pattern, lower_query if not self.is_devanagari(vern_key) else raw_query, re.IGNORECASE):
+            pattern = rf"\b{re.escape(vern_key.lower())}\b" if not self.is_indic_script(vern_key) else re.escape(vern_key)
+            if re.search(pattern, lower_query if not self.is_indic_script(vern_key) else raw_query, re.IGNORECASE):
                 detected_terms.append(vern_key)
                 expanded_parts.append(eng_expansion)
 
@@ -58,13 +58,13 @@ class VernacularNormalizer:
                 detected_terms.append(k_word)
                 expanded_parts.append(k_trans)
 
-        is_vernacular = len(detected_terms) > 0 or has_devanagari
+        is_vernacular = len(detected_terms) > 0 or has_indic
         normalized_query = " ".join(expanded_parts)
 
         meta = {
             "original_query": raw_query,
             "is_vernacular": is_vernacular,
-            "has_devanagari": has_devanagari,
+            "has_indic_script": has_indic,
             "detected_vernacular_terms": detected_terms,
             "expanded_query": normalized_query
         }

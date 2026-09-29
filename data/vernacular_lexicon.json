@@ -31,7 +31,22 @@
     "ready mix concrete": "ready mixed concrete RMC batching plant quality control IS 4926",
     "मोर्टार सीमेंट": "masonry cement plastering work mortar IS 3466 IS 2116",
     "plaster cement": "portland pozzolana cement masonry cement sand for mortar IS 1489 IS 3466 IS 2116",
-    "भूकंप रोधी सरिया": "high strength deformed steel bars ductile detailing Fe 500D Fe 550D IS 1786 IS 13920"
+    "भूकंप रोधी सरिया": "high strength deformed steel bars ductile detailing Fe 500D Fe 550D IS 1786 IS 13920",
+    "స్టీల్": "TMT bars high strength deformed steel reinforcement IS 1786 Fe 500D Fe 550",
+    "సిమెంట్": "portland cement IS 456 IS 269 IS 1489",
+    "ఇసుక": "coarse and fine sand natural sources aggregates for concrete IS 383 IS 2116",
+    "కాంక్రీట్": "plain and reinforced concrete foundation mass concrete IS 456",
+    "ఇటుక": "common burnt clay building bricks masonry works IS 1077",
+    "கம்பி": "TMT bars high strength deformed steel reinforcement IS 1786 Fe 500D Fe 550",
+    "சிமெண்ட்": "portland cement IS 456 IS 269 IS 1489",
+    "மணல்": "coarse and fine sand natural sources aggregates for concrete IS 383 IS 2116",
+    "கான்கிரீட்": "plain and reinforced concrete foundation mass concrete IS 456",
+    "செங்கல்": "common burnt clay building bricks masonry works IS 1077",
+    "রড": "TMT bars high strength deformed steel reinforcement IS 1786 Fe 500D Fe 550",
+    "সিমেন্ট": "portland cement IS 456 IS 269 IS 1489",
+    "বালি": "coarse and fine sand natural sources aggregates for concrete IS 383 IS 2116",
+    "কংক্রিট": "plain and reinforced concrete foundation mass concrete IS 456",
+    "ইট": "common burnt clay building bricks masonry works IS 1077"
   },
   "vernacular_keywords": {
     "सरिया": "rebar / reinforcement steel",
@@ -44,6 +59,21 @@
     "रोड़ी": "coarse aggregate",
     "छत": "roof / slab",
     "नींव": "foundation",
-    "पुल": "bridge / prestressed concrete"
+    "पुल": "bridge / prestressed concrete",
+    "స్టీల్": "rebar / reinforcement steel",
+    "సిమెంట్": "cement",
+    "కాంక్రీట్": "concrete",
+    "ఇసుక": "sand / fine aggregate",
+    "ఇటుక": "brick",
+    "கம்பி": "rebar / reinforcement steel",
+    "சிமெண்ட்": "cement",
+    "கான்கிரீட்": "concrete",
+    "மணல்": "sand / fine aggregate",
+    "செங்கல்": "brick",
+    "রড": "rebar / reinforcement steel",
+    "সিমেন্ট": "cement",
+    "কংক্রিট": "concrete",
+    "বালি": "sand / fine aggregate",
+    "ইট": "brick"
   }
 }
